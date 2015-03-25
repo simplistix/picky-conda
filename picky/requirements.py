@@ -39,29 +39,39 @@ class Requirements(object):
     def serialise(self):
         return '\n'.join(self.lines)+'\n'
 
-    def apply(self, diff, when):
+    def comment_line(self, package, message):
+        i = self.map[package]
+        original = self.lines[i]
+        self.lines[i] = '# {} {}'.format(original, message)
+
+    def add_line(self, package, version):
+        self.lines.append(self.serialise_line(package, version))
+        self.map[package] = len(self.lines)
+
+    def remove_line(self, package, when_str):
+        self.comment_line(package, 'removed by picky on {}'.format(
+            when_str
+        ))
+        del self.map[package]
+
+    def when_str(self, when):
         when_str = when.strftime('%Y-%m-%d %H:%M:%S')
+        return when_str
+
+    def apply(self, diff, when):
+        when_str = self.when_str(when)
 
         if diff.added or diff.changed:
             self.lines.append('# picky changes from {} below:'.format(when_str))
 
         for package, version in diff.added.items():
-            self.lines.append(self.serialise_line(package, version))
-            self.map[package] = len(self.lines)
+            self.add_line(package, version)
 
         for package, version in diff.changed.items():
-            i = self.map[package]
-            original = self.lines[i]
-            self.lines[i] = '# {} updated by picky to {} on {}'.format(
-                original, version, when_str
-            )
-            self.lines.append(self.serialise_line(package, version))
-            self.map[len(self.lines)] = package
+            self.comment_line(package, 'updated by picky to {} on {}'.format(
+                version, when_str
+            ))
+            self.add_line(package, version)
 
         for package in diff.removed:
-            i = self.map[package]
-            original = self.lines[i]
-            self.lines[i] = '# {} removed by picky on {}'.format(
-                original, when_str
-            )
-            del self.map[package]
+            self.remove_line(package, when_str)
