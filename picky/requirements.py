@@ -75,3 +75,17 @@ class Requirements(object):
 
         for package in diff.removed:
             self.remove_line(package, when_str)
+
+    def combine_with(self, other, when):
+
+        when_str = self.when_str(when)
+        self_packages = set(self.versions)
+        other_packages = set(other.versions)
+
+        for package in self_packages & other_packages:
+            self_version = self.versions[package]
+            other_version = other.versions[package]
+            if self_version == other_version:
+                other.remove_line(package, when_str)
+            else:
+                self.remove_line(package, when_str)

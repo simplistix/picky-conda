@@ -67,3 +67,31 @@ p2=2
 p4=4
 p3=3.1
 ''')
+
+    def test_combine_with(self):
+        r1 = requirements('''
+p1=1
+p2=2
+p3=3
+''')
+        r2 = requirements('''
+p2=2
+p3=3.1
+p4=4
+''')
+
+        r1.combine_with(r2, datetime(2001, 2, 3, 4, 5, 6))
+
+        compare(r1.serialise(), '''
+p1=1
+p2=2
+# p3=3 removed by picky on 2001-02-03 04:05:06
+''')
+
+        compare(r2.serialise(), '''
+# p2=2 removed by picky on 2001-02-03 04:05:06
+p3=3.1
+p4=4
+''')
+
+
