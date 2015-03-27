@@ -13,18 +13,19 @@ setup(
     author='Chris Withers',
     author_email='chris@simplistix.co.uk',
     license='MIT',
-    description="A tool for reporting versions of packages used in a mixed conda/pip environment",
+    description=(
+        "A tool for checking versions of packages used by conda or pip "
+        "are as specified in their requirements files."
+    ),
     # long_description=open(os.path.join(base_dir,'docs','description.txt')).read(),
-    # url='http://www.simplistix.co.uk/software/python/testfixtures',
+    url='http://www.simplistix.co.uk/software/python/testfixtures',
     classifiers=[
         # 'Development Status :: 5 - Production/Stable',
-        # 'Intended Audience :: Developers',
+        'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python :: 2',
-        # 'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
-        # 'Programming Language :: Python :: 3.2',
         'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
     ],
