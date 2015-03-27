@@ -1,6 +1,6 @@
 from unittest import TestCase
 from datetime import datetime
-from testfixtures import compare
+from testfixtures import compare, LogCapture
 from picky.requirements import Requirements, Diff
 
 
@@ -43,9 +43,18 @@ p4=4
 
         compare(actual.added, dict(p4='4'))
         compare(actual.removed, dict(p1='1'))
-        compare(actual.changed, dict(p3='3.1'))
+        compare(actual.changed, dict(p3=('3', '3.1')))
 
         self.assertTrue(actual)
+
+        with LogCapture() as log:
+            actual.log()
+            logger = 'picky.requirements'
+            log.check(
+                (logger, 'WARNING', 'p4 added with version 4'),
+                (logger, 'WARNING', 'p3 changed version from 3 to 3.1'),
+                (logger, 'WARNING', 'p1 was removed'),
+            )
 
     def test_same(self):
         r = requirements('''
@@ -58,6 +67,10 @@ p1=1
         compare(actual.changed, dict())
 
         self.assertFalse(actual)
+
+        with LogCapture() as log:
+            actual.log()
+            log.check()
 
     def test_update(self):
         r1 = requirements('''

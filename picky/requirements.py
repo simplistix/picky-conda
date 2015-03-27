@@ -1,3 +1,8 @@
+from logging import getLogger
+
+
+logger = getLogger(__name__)
+
 class Diff(object):
 
     def __init__(self, x, y):
@@ -18,10 +23,21 @@ class Diff(object):
             x_version = x.versions[package]
             y_version = y.versions[package]
             if x_version != y_version:
-                self.changed[package] = y_version
+                self.changed[package] = x_version, y_version
 
     def __len__(self):
         return len(self.added) + len(self.removed) + len(self.changed)
+
+    def log(self):
+        log = logger.warn
+        for package, version in sorted(self.added.items()):
+            log('%s added with version %s', package, version)
+        for package, versions in sorted(self.changed.items()):
+            old_version, new_version = versions
+            log('%s changed version from %s to %s',
+                package, old_version, new_version)
+        for package in sorted(self.removed):
+            log('%s was removed', package)
 
 
 class Requirements(object):
@@ -70,11 +86,12 @@ class Requirements(object):
         for package, version in diff.added.items():
             self.add_line(package, version)
 
-        for package, version in diff.changed.items():
+        for package, versions in diff.changed.items():
+            old_version, new_version = versions
             self.comment_line(package, 'updated by picky to {} on {}'.format(
-                version, when_str
+                new_version, when_str
             ))
-            self.add_line(package, version)
+            self.add_line(package, new_version)
 
         for package in diff.removed:
             self.remove_line(package, when_str)
