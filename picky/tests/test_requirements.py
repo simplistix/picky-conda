@@ -45,6 +45,20 @@ p4=4
         compare(actual.removed, dict(p1='1'))
         compare(actual.changed, dict(p3='3.1'))
 
+        self.assertTrue(actual)
+
+    def test_same(self):
+        r = requirements('''
+p1=1
+        ''')
+        actual = Diff(r, r)
+
+        compare(actual.added, dict())
+        compare(actual.removed, dict())
+        compare(actual.changed, dict())
+
+        self.assertFalse(actual)
+
     def test_update(self):
         r1 = requirements('''
 p1=1

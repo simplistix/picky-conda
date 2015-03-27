@@ -20,6 +20,9 @@ class Diff(object):
             if x_version != y_version:
                 self.changed[package] = y_version
 
+    def __len__(self):
+        return len(self.added) + len(self.removed) + len(self.changed)
+
 
 class Requirements(object):
 
