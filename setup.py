@@ -18,7 +18,7 @@ setup(
         "are as specified in their requirements files."
     ),
     # long_description=open(os.path.join(base_dir,'docs','description.txt')).read(),
-    url='http://www.simplistix.co.uk/software/python/testfixtures',
+    url='https://github.com/Simplistix/picky',
     classifiers=[
         # 'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
