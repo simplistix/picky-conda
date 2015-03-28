@@ -13,8 +13,8 @@ def serialise_line(name, version):
     return name+'='+version
 
 
-def requirements(text):
-    return Requirements(text, parse_line, serialise_line)
+def requirements(text, source='x'):
+    return Requirements(text, parse_line, serialise_line, source)
 
 
 class AbstractTests(TestCase):
@@ -33,12 +33,12 @@ y=2
 p1=1
 p2=2
 p3=3
-        ''')
+        ''', source='r1')
         r2 = requirements('''
 p2=2
 p3=3.1
 p4=4
-        ''')
+        ''', source='r2')
         actual = Diff(r1, r2)
 
         compare(actual.added, dict(p4='4'))
@@ -51,9 +51,9 @@ p4=4
             actual.log()
             logger = 'picky.requirements'
             log.check(
-                (logger, 'WARNING', 'p4 added with version 4'),
-                (logger, 'WARNING', 'p3 changed version from 3 to 3.1'),
-                (logger, 'WARNING', 'p1 was removed'),
+                (logger, 'WARNING', 'p4 4 missing from r1'),
+                (logger, 'WARNING', 'p3 3.1 in r2 but 3 in r1'),
+                (logger, 'WARNING', 'p1 1 missing from r2'),
             )
 
     def test_same(self):

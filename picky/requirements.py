@@ -9,6 +9,8 @@ class Diff(object):
         self.added = {}
         self.removed = {}
         self.changed = {}
+        self.x_source = x.source
+        self.y_source = y.source
 
         x_packages = set(x.versions)
         y_packages = set(y.versions)
@@ -31,19 +33,20 @@ class Diff(object):
     def log(self):
         log = logger.warn
         for package, version in sorted(self.added.items()):
-            log('%s added with version %s', package, version)
+            log('%s %s missing from %s', package, version, self.x_source)
         for package, versions in sorted(self.changed.items()):
             old_version, new_version = versions
-            log('%s changed version from %s to %s',
-                package, old_version, new_version)
-        for package in sorted(self.removed):
-            log('%s was removed', package)
+            log('%s %s in %s but %s in %s',
+                package, new_version, self.y_source, old_version, self.x_source)
+        for package, version in sorted(self.removed.items()):
+            log('%s %s missing from %s', package, version, self.y_source)
 
 
 class Requirements(object):
 
-    def __init__(self, text, parse_line, serialise_line):
+    def __init__(self, text, parse_line, serialise_line, source):
         self.serialise_line = serialise_line
+        self.source = source
         self.lines = []
         self.versions = {}
         self.map = {}

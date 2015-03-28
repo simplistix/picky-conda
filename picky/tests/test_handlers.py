@@ -35,8 +35,11 @@ class HandlerTestHelpers(object):
         log.check(*expected_logging)
         return handler
 
-    def check_requirements(self, obj, **expected_versions):
-        compare(C(Requirements, versions=expected_versions, strict=False),
+    def check_requirements(self, obj, source, **expected_versions):
+        compare(C(Requirements,
+                  versions=expected_versions,
+                  source=source,
+                  strict=False),
                 obj)
 
 
@@ -50,11 +53,13 @@ class PipTests(HandlerTestHelpers, TestCase):
             ('INFO', "Using '%(command)s' for pip"),
             ('INFO', "Using '%(spec)s' for pip"),
         )
-        self.assertTrue(handler.executable)
+        self.assertTrue(handler.executable_found)
         self.check_requirements(handler.used,
+                                'pip freeze',
                                 testfixtures='4.1.2',
                                 picky='0.0.dev0')
         self.check_requirements(handler.specified,
+                                'requirements.txt',
                                 foo='2',
                                 baz='3')
 
@@ -62,30 +67,32 @@ class PipTests(HandlerTestHelpers, TestCase):
         handler = self.make_handler(
             'pip_freeze_simple.py', 'missing.txt',
             ('INFO', "Using '%(command)s' for pip"),
-            ('DEBUG', "No requirements file found for pip"),
+            ('DEBUG', "'%(spec)s' not found"),
         )
-        self.assertTrue(handler.executable)
+        self.assertTrue(handler.executable_found)
         self.check_requirements(handler.used,
+                                'pip freeze',
                                 testfixtures='4.1.2',
                                 picky='0.0.dev0')
-        self.check_requirements(handler.specified)
+        self.check_requirements(handler.specified,
+                                'missing.txt')
 
     def test_path_no_command(self):
         handler = self.make_handler(
             'missing.py', 'requirements.txt',
-            ('DEBUG', "No pip found"),
+            ('DEBUG', "'%(command)s' not found"),
             ('INFO', "Using '%(spec)s' for pip"),
             ('ERROR', "'%(spec)s' found but pip missing")
         )
-        self.assertFalse(handler.executable)
+        self.assertFalse(handler.executable_found)
 
     def test_neither_path_nor_command(self):
         handler = self.make_handler(
             'missing.py', 'bad-requirements.txt',
-            ('DEBUG', "No pip found"),
-            ('DEBUG', "No requirements file found for pip"),
+            ('DEBUG', "'%(command)s' not found"),
+            ('DEBUG', "'%(spec)s' not found"),
         )
-        self.assertFalse(handler.executable)
+        self.assertFalse(handler.executable_found)
 
     def test_no_vcs_remote(self):
         handler = self.make_handler(
@@ -93,11 +100,13 @@ class PipTests(HandlerTestHelpers, TestCase):
             ('INFO', "Using '%(command)s' for pip"),
             ('INFO', "Using '%(spec)s' for pip"),
         )
-        self.assertTrue(handler.executable)
+        self.assertTrue(handler.executable_found)
         self.check_requirements(handler.used,
+                                'pip freeze',
                                 testfixtures='4.1.2',
                                 picky='0.0.dev0')
         self.check_requirements(handler.specified,
+                                'requirements.txt',
                                 foo='2',
                                 baz='3')
 
@@ -121,11 +130,13 @@ class CondaTests(HandlerTestHelpers, TestCase):
             ('INFO', "Using '%(command)s' for conda"),
             ('INFO', "Using '%(spec)s' for conda"),
         )
-        self.assertTrue(handler.executable)
+        self.assertTrue(handler.executable_found)
         self.check_requirements(handler.used,
+                                'conda list -e',
                                 python='2.7.9',
                                 pip='6.0.8')
         self.check_requirements(handler.specified,
+                                'conda_versions.txt',
                                 foo='2',
                                 baz='3')
 
@@ -133,30 +144,32 @@ class CondaTests(HandlerTestHelpers, TestCase):
         handler = self.make_handler(
             'conda_list_simple.py', 'missing.txt',
             ('INFO', "Using '%(command)s' for conda"),
-            ('DEBUG', "No requirements file found for conda"),
+            ('DEBUG', "'%(spec)s' not found"),
         )
-        self.assertTrue(handler.executable)
+        self.assertTrue(handler.executable_found)
         self.check_requirements(handler.used,
+                                'conda list -e',
                                 python='2.7.9',
                                 pip='6.0.8')
-        self.check_requirements(handler.specified)
+        self.check_requirements(handler.specified,
+                                'missing.txt')
 
     def test_path_no_command(self):
         handler = self.make_handler(
             'missing.py', 'conda_versions.txt',
-            ('DEBUG', "No conda found"),
+            ('DEBUG', "'%(command)s' not found"),
             ('INFO', "Using '%(spec)s' for conda"),
             ('ERROR', "'%(spec)s' found but conda missing")
         )
-        self.assertFalse(handler.executable)
+        self.assertFalse(handler.executable_found)
 
     def test_neither_path_nor_command(self):
         handler = self.make_handler(
             'missing.py', 'bad-conda-versions.txt',
-            ('DEBUG', "No conda found"),
-            ('DEBUG', "No requirements file found for conda"),
+            ('DEBUG', "'%(command)s' not found"),
+            ('DEBUG', "'%(spec)s' not found"),
         )
-        self.assertFalse(handler.executable)
+        self.assertFalse(handler.executable_found)
 
     def test_parse_commented(self):
         compare(None, self.class_.parse_line('# foo=1.0=1'))

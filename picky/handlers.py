@@ -21,33 +21,56 @@ class Handler(object):
     def serialise_line(name, version):
         raise NotImplementedError
 
+    def read_source(self, if_, callable_, param, source):
+        if if_:
+            text = callable_(param)
+            logger.info('Using %r for %s', param, self.name)
+        else:
+            text = ''
+            logger.debug('%r not found', param)
+        return self.requirements(text, source)
+
+    def run_command(self, command):
+        return check_output((command, )+self.args,
+                            stderr=TemporaryFile())
+
+    def read_file(self, path):
+        with open(path) as source:
+            return source.read()
+
+    def find_executable(self, command):
+        executable = find_executable(command)
+        if executable:
+            return True, os.path.abspath(executable)
+        else:
+            return False, command
+
     def __init__(self, command, path):
-        self.executable = find_executable(command)
+        self.executable_found, executable = self.find_executable(command)
         path_exists = os.path.exists(path)
 
-        if self.executable:
-            text = check_output((command, )+self.args,
-                                stderr=TemporaryFile())
-            logger.info('Using %r for %s', self.executable, self.name)
-        else:
-            text = ''
-            logger.debug('No %s found', self.name)
-        self.used = self.requirements(text)
+        self.used = self.read_source(
+            if_=self.executable_found,
+            callable_=self.run_command,
+            param=executable,
+            source=' '.join((self.name, )+self.args)
+        )
 
-        if path_exists:
-            with open(path) as source:
-                text = source.read()
-            logger.info('Using %r for %s', path, self.name)
-        else:
-            text = ''
-            logger.debug('No requirements file found for %s', self.name)
-        self.specified = self.requirements(text)
+        self.specified = self.read_source(
+            if_=path_exists,
+            callable_=self.read_file,
+            param=path,
+            source=os.path.split(path)[-1]
+        )
 
-        if path_exists and not self.executable:
+        if path_exists and not self.executable_found:
             logger.error('%r found but %s missing', path, self.name)
 
-    def requirements(self, text):
-        return Requirements(text, self.parse_line, self.serialise_line)
+    def requirements(self, text, source):
+        return Requirements(text,
+                            self.parse_line,
+                            self.serialise_line,
+                            source)
 
 
 class PipHandler(Handler):
