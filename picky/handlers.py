@@ -23,11 +23,11 @@ class Handler(object):
 
     def read_source(self, if_, callable_, param, source):
         if if_:
-            text = callable_(param)
             logger.info('Using %r for %s', param, self.name)
+            text = callable_(param)
         else:
-            text = ''
             logger.debug('%r not found', param)
+            text = ''
         return self.requirements(text, source)
 
     def run_command(self, command):
