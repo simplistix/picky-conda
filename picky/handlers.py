@@ -85,7 +85,7 @@ class PipHandler(Handler):
     @staticmethod
     def parse_line(line):
         line = line.split('#')[0]
-        if '==' in line:
+        if '==' in line and not line.startswith('-e '):
             return (p.strip() for p in line.split('=='))
 
     @staticmethod

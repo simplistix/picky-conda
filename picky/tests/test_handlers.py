@@ -115,6 +115,37 @@ class PipTests(HandlerTestHelpers, TestCase):
                                 'requirements.txt',
                                 foo='2',
                                 baz='3')
+        compare('## !! Could not determine repository location\n'
+                'picky==0.0.dev0\n'
+                'testfixtures==4.1.2\n',
+                handler.used.serialise())
+
+    def test_no_git(self):
+        handler = self.make_handler(
+            'pip_freeze_no_git.py', 'x',
+            ('INFO', "Using '%(command)s' for pip"),
+            ('ERROR', 'pip gave errors: cannot determine version of '
+                      'editable source in /Users/chris/LocalGIT/picky\n'
+                      '(git command not found in path)\n'),
+            ('DEBUG', "'%(spec)s' not found"),
+        )
+        self.assertTrue(handler.executable_found)
+        self.check_requirements(handler.used,
+                                'pip freeze')
+        compare('-e picky==0.0.dev0\n', handler.used.serialise())
+
+    def test_git(self):
+        handler = self.make_handler(
+            'pip_freeze_git.py', 'x',
+            ('INFO', "Using '%(command)s' for pip"),
+            ('DEBUG', "'%(spec)s' not found"),
+        )
+        self.assertTrue(handler.executable_found)
+        self.check_requirements(handler.used,
+                                'pip freeze')
+        compare('-e git+https://github.com/Simplistix/picky.git'
+                '@181903dc9a100ead5879ebc0ed81d12145be68d9'
+                '#egg=picky-master\n', handler.used.serialise())
 
     def test_parse_commented(self):
         compare(None, self.class_.parse_line('# foo==1.0'))
