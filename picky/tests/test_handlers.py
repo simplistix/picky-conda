@@ -98,6 +98,12 @@ class PipTests(HandlerTestHelpers, TestCase):
         handler = self.make_handler(
             'pip_freeze_no_vcs_remote.py', 'requirements.txt',
             ('INFO', "Using '%(command)s' for pip"),
+            ('ERROR', 'pip gave errors: Error when trying to get requirement '
+                      'for VCS system Command "/usr/bin/git config '
+                      'remote.origin.url" failed with error code 1 in xxx, '
+                      'falling back to uneditable format\n'
+                      'Could not determine repository location of '
+                      '/Users/chris/LocalGIT/picky\n'),
             ('INFO', "Using '%(spec)s' for pip"),
         )
         self.assertTrue(handler.executable_found)

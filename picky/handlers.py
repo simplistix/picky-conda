@@ -1,9 +1,10 @@
 from distutils.spawn import find_executable
 from logging import getLogger
 import os
-from subprocess import check_output
-from tempfile import TemporaryFile
+from subprocess import Popen, PIPE
+
 from picky.requirements import Requirements
+
 
 logger = getLogger(__name__)
 
@@ -31,8 +32,11 @@ class Handler(object):
         return self.requirements(text, source)
 
     def run_command(self, command):
-        return check_output((command, )+self.args,
-                            stderr=TemporaryFile())
+        process = Popen((command, )+self.args, stdout=PIPE, stderr=PIPE)
+        stdout, stderr = process.communicate()
+        if stderr:
+            logger.error('%s gave errors: %s', self.name, stderr)
+        return stdout
 
     def read_file(self, path):
         with open(path) as source:
