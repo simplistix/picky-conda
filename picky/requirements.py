@@ -76,7 +76,8 @@ class Requirements(object):
         ))
         del self.map[package]
 
-    def when_str(self, when):
+    @staticmethod
+    def when_str(when):
         when_str = when.strftime('%Y-%m-%d %H:%M:%S')
         return when_str
 
