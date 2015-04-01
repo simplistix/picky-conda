@@ -86,14 +86,15 @@ p4=4
         diff = Diff(r1, r2)
         r1.apply(diff, datetime(2001, 2, 3, 4, 5, 6))
 
-        compare(r1.serialise(), '''
+        compare('''
 # p1=1 removed by picky on 2001-02-03 04:05:06
 p2=2
 # p3=3 updated by picky to 3.1 on 2001-02-03 04:05:06
-# picky changes from 2001-02-03 04:05:06 below:
+# picky added the following on 2001-02-03 04:05:06:
 p4=4
+# picky updated the following on 2001-02-03 04:05:06:
 p3=3.1
-''')
+''', r1.serialise())
 
     def test_combine_with(self):
         r1 = requirements('''

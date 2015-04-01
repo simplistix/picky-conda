@@ -84,18 +84,25 @@ class Requirements(object):
     def apply(self, diff, when):
         when_str = self.when_str(when)
 
-        if diff.added or diff.changed:
-            self.lines.append('# picky changes from {} below:'.format(when_str))
-
-        for package, version in diff.added.items():
-            self.add_line(package, version)
-
-        for package, versions in diff.changed.items():
-            old_version, new_version = versions
-            self.comment_line(package, 'updated by picky to {} on {}'.format(
-                new_version, when_str
+        if diff.added:
+            self.lines.append('# picky added the following on {}:'.format(
+                when_str
             ))
-            self.add_line(package, new_version)
+            for package, version in diff.added.items():
+                self.add_line(package, version)
+
+        if diff.changed:
+
+            self.lines.append('# picky updated the following on {}:'.format(
+                when_str
+            ))
+            for package, versions in diff.changed.items():
+                old_version, new_version = versions
+                self.comment_line(
+                    package, 'updated by picky to {} on {}'.format(
+                    new_version, when_str
+                ))
+                self.add_line(package, new_version)
 
         for package in diff.removed:
             self.remove_line(package, when_str)
