@@ -7,18 +7,12 @@ from testfixtures import Comparison as C, LogCapture, OutputCapture, compare, \
 
 from picky.handlers import CondaHandler, PipHandler, Handler
 from picky.requirements import Requirements, Diff
+from picky.tests import sample_output_path
 
 
 class HandlerTestHelpers(object):
 
     class_ = Handler
-
-    def path(self, filename):
-        return os.path.join(
-            os.path.dirname(__file__),
-            'sample_output',
-            filename
-        )
 
     def check_logging(self, command_path, spec_path, log, *logging):
         expected_logging = []
@@ -30,7 +24,7 @@ class HandlerTestHelpers(object):
         log.check(*expected_logging)
 
     def make_handler(self, command, spec_path):
-        command_path = self.path(command)
+        command_path = sample_output_path(command)
         with OutputCapture() as output:
             handler = self.class_(command_path, spec_path)
         # make sure there's no output!
@@ -38,7 +32,7 @@ class HandlerTestHelpers(object):
         return command_path, handler
 
     def make_and_check(self, command, spec, *logging):
-        spec_path = self.path(spec)
+        spec_path = sample_output_path(spec)
         with LogCapture() as log:
             command_path, handler = self.make_handler(command, spec_path)
         self.check_logging(command_path, spec_path, log, *logging)
