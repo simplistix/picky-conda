@@ -52,6 +52,7 @@ class Handler(object):
     def __init__(self, command, path):
         self.executable_found, executable = self.find_executable(command)
         path_exists = os.path.exists(path)
+        self.path = path
 
         self.used = self.read_source(
             if_=self.executable_found,
@@ -75,6 +76,17 @@ class Handler(object):
                             self.parse_line,
                             self.serialise_line,
                             source)
+
+    def update(self, diff, when):
+        if self.executable_found:
+            if diff:
+                logger.info('Writing %r', self.path)
+                self.specified.apply(diff, when)
+                with open(self.path, 'w') as target:
+                    target.write(self.specified.serialise())
+            else:
+                logger.debug('No differences to apply to %r', self.path)
+
 
 
 class PipHandler(Handler):

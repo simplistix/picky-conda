@@ -1,10 +1,12 @@
 import os
 from unittest import TestCase
+from datetime import datetime
 
-from testfixtures import Comparison as C, LogCapture, OutputCapture, compare
+from testfixtures import Comparison as C, LogCapture, OutputCapture, compare, \
+    TempDirectory
 
 from picky.handlers import CondaHandler, PipHandler, Handler
-from picky.requirements import Requirements
+from picky.requirements import Requirements, Diff
 
 
 class HandlerTestHelpers(object):
@@ -18,14 +20,7 @@ class HandlerTestHelpers(object):
             filename
         )
 
-    def make_handler(self, command, spec, *logging):
-        command_path = self.path(command)
-        spec_path = self.path(spec)
-        with LogCapture() as log:
-            with OutputCapture() as output:
-                handler = self.class_(command_path, spec_path)
-        # make sure there's no output!
-        output.compare('')
+    def check_logging(self, command_path, spec_path, log, *logging):
         expected_logging = []
         for level, template in logging:
             expected_logging.append((
@@ -33,6 +28,20 @@ class HandlerTestHelpers(object):
                     command=command_path, spec=spec_path
                 )))
         log.check(*expected_logging)
+
+    def make_handler(self, command, spec_path):
+        command_path = self.path(command)
+        with OutputCapture() as output:
+            handler = self.class_(command_path, spec_path)
+        # make sure there's no output!
+        output.compare('')
+        return command_path, handler
+
+    def make_and_check(self, command, spec, *logging):
+        spec_path = self.path(spec)
+        with LogCapture() as log:
+            command_path, handler = self.make_handler(command, spec_path)
+        self.check_logging(command_path, spec_path, log, *logging)
         return handler
 
     def check_requirements(self, obj, source, **expected_versions):
@@ -42,13 +51,35 @@ class HandlerTestHelpers(object):
                   strict=False),
                 obj)
 
+    def check_update(self, command,
+                     original_spec, expected_spec,
+                     *logging):
+        spec_name = 'spec.txt'
+        with TempDirectory() as dir:
+            if original_spec:
+                dir.write(spec_name, original_spec)
+            with LogCapture() as log:
+                spec_path = dir.getpath(spec_name)
+                command_path, handler = self.make_handler(
+                    command, spec_path
+                )
+                diff = Diff(handler.specified, handler.used)
+                handler.update(diff, datetime(2001, 1, 2, 3, 4, 5))
+                if os.path.exists(spec_path):
+                    actual_spec = dir.read(spec_name)
+                else:
+                    actual_spec = None
+                compare(expected_spec, actual_spec)
+        self.check_logging(command_path, spec_path, log, *logging)
+
+
 
 class PipTests(HandlerTestHelpers, TestCase):
 
     class_ = PipHandler
 
     def test_simple(self):
-        handler = self.make_handler(
+        handler = self.make_and_check(
             'pip_freeze_simple.py', 'requirements.txt',
             ('INFO', "Using '%(command)s' for pip"),
             ('INFO', "Using '%(spec)s' for pip"),
@@ -64,7 +95,7 @@ class PipTests(HandlerTestHelpers, TestCase):
                                 baz='3')
 
     def test_command_no_path(self):
-        handler = self.make_handler(
+        handler = self.make_and_check(
             'pip_freeze_simple.py', 'missing.txt',
             ('INFO', "Using '%(command)s' for pip"),
             ('DEBUG', "'%(spec)s' not found"),
@@ -78,7 +109,7 @@ class PipTests(HandlerTestHelpers, TestCase):
                                 'missing.txt')
 
     def test_path_no_command(self):
-        handler = self.make_handler(
+        handler = self.make_and_check(
             'missing.py', 'requirements.txt',
             ('DEBUG', "'%(command)s' not found"),
             ('INFO', "Using '%(spec)s' for pip"),
@@ -87,7 +118,7 @@ class PipTests(HandlerTestHelpers, TestCase):
         self.assertFalse(handler.executable_found)
 
     def test_neither_path_nor_command(self):
-        handler = self.make_handler(
+        handler = self.make_and_check(
             'missing.py', 'bad-requirements.txt',
             ('DEBUG', "'%(command)s' not found"),
             ('DEBUG', "'%(spec)s' not found"),
@@ -95,7 +126,7 @@ class PipTests(HandlerTestHelpers, TestCase):
         self.assertFalse(handler.executable_found)
 
     def test_no_vcs_remote(self):
-        handler = self.make_handler(
+        handler = self.make_and_check(
             'pip_freeze_no_vcs_remote.py', 'requirements.txt',
             ('INFO', "Using '%(command)s' for pip"),
             ('ERROR', 'pip gave errors: Error when trying to get requirement '
@@ -121,7 +152,7 @@ class PipTests(HandlerTestHelpers, TestCase):
                 handler.used.serialise())
 
     def test_no_git(self):
-        handler = self.make_handler(
+        handler = self.make_and_check(
             'pip_freeze_no_git.py', 'x',
             ('INFO', "Using '%(command)s' for pip"),
             ('ERROR', 'pip gave errors: cannot determine version of '
@@ -135,7 +166,7 @@ class PipTests(HandlerTestHelpers, TestCase):
         compare('-e picky==0.0.dev0\n', handler.used.serialise())
 
     def test_git(self):
-        handler = self.make_handler(
+        handler = self.make_and_check(
             'pip_freeze_git.py', 'x',
             ('INFO', "Using '%(command)s' for pip"),
             ('DEBUG', "'%(spec)s' not found"),
@@ -156,13 +187,86 @@ class PipTests(HandlerTestHelpers, TestCase):
     def test_serialise(self):
         compare('foo==1.0', self.class_.serialise_line('foo', '1.0'))
 
+    def test_update_create(self):
+        self.check_update(
+            'pip_freeze_simple.py',
+            # original spec:
+            None,
+            # expected spec:
+            '# picky added the following on 2001-01-02 03:04:05:\n'
+            'testfixtures==4.1.2\n'
+            'picky==0.0.dev0\n',
+            # expected logging:
+            ('INFO', "Using '%(command)s' for pip"),
+            ('DEBUG', "'%(spec)s' not found"),
+            ('INFO', "Writing '%(spec)s'")
+        )
+
+    def test_update_changes(self):
+        self.check_update(
+            'pip_freeze_for_update.py',
+            # original spec:
+            '\n'
+            'c==1.0\n'
+            '#a comment\n'
+            'a==2\n'
+            'b==3\n',
+            # expected spec:
+            '\n'
+            'c==1.0\n'
+            '#a comment\n'
+            '# a==2 removed by picky on 2001-01-02 03:04:05\n'
+            '# b==3 updated by picky to 4 on 2001-01-02 03:04:05\n'
+            '# picky added the following on 2001-01-02 03:04:05:\n'
+            'd==5\n'
+            '# picky updated the following on 2001-01-02 03:04:05:\n'
+            'b==4\n',
+            # expected logging:
+            ('INFO', "Using '%(command)s' for pip"),
+            ('INFO', "Using '%(spec)s' for pip"),
+            ('INFO', "Writing '%(spec)s'")
+        )
+
+    def test_update_no_changes(self):
+        requirements_content = '''
+        # some comment
+        picky==0.0.dev0
+        # more junk
+        # junk==1.2.3 removed by picky before
+
+        testfixtures==4.1.2
+'''
+        self.check_update(
+            'pip_freeze_simple.py',
+            # original spec:
+            requirements_content,
+            # expected spec:
+            requirements_content,
+            # expected logging:
+            ('INFO', "Using '%(command)s' for pip"),
+            ('INFO', "Using '%(spec)s' for pip"),
+            ('DEBUG', "No differences to apply to '%(spec)s'")
+        )
+
+    def test_update_no_command(self):
+        self.check_update(
+            'missing.py',
+            # original spec:
+            None,
+            # expected spec:
+            None,
+            # expected logging:
+            ('DEBUG', "'%(command)s' not found"),
+            ('DEBUG', "'%(spec)s' not found"),
+        )
+
 
 class CondaTests(HandlerTestHelpers, TestCase):
 
     class_ = CondaHandler
 
     def test_simple(self):
-        handler = self.make_handler(
+        handler = self.make_and_check(
             'conda_list_simple.py', 'conda_versions.txt',
             ('INFO', "Using '%(command)s' for conda"),
             ('INFO', "Using '%(spec)s' for conda"),
@@ -178,7 +282,7 @@ class CondaTests(HandlerTestHelpers, TestCase):
                                 baz='3')
 
     def test_command_no_path(self):
-        handler = self.make_handler(
+        handler = self.make_and_check(
             'conda_list_simple.py', 'missing.txt',
             ('INFO', "Using '%(command)s' for conda"),
             ('DEBUG', "'%(spec)s' not found"),
@@ -192,7 +296,7 @@ class CondaTests(HandlerTestHelpers, TestCase):
                                 'missing.txt')
 
     def test_path_no_command(self):
-        handler = self.make_handler(
+        handler = self.make_and_check(
             'missing.py', 'conda_versions.txt',
             ('DEBUG', "'%(command)s' not found"),
             ('INFO', "Using '%(spec)s' for conda"),
@@ -201,7 +305,7 @@ class CondaTests(HandlerTestHelpers, TestCase):
         self.assertFalse(handler.executable_found)
 
     def test_neither_path_nor_command(self):
-        handler = self.make_handler(
+        handler = self.make_and_check(
             'missing.py', 'bad-conda-versions.txt',
             ('DEBUG', "'%(command)s' not found"),
             ('DEBUG', "'%(spec)s' not found"),
@@ -216,3 +320,76 @@ class CondaTests(HandlerTestHelpers, TestCase):
 
     def test_serialise(self):
         compare('foo=1.0', self.class_.serialise_line('foo', '1.0'))
+
+    def test_update_create(self):
+        self.check_update(
+            'conda_list_simple.py',
+            # original spec:
+            None,
+            # expected spec:
+            '# picky added the following on 2001-01-02 03:04:05:\n'
+            'pip=6.0.8\n'
+            'python=2.7.9\n',
+            # expected logging:
+            ('INFO', "Using '%(command)s' for conda"),
+            ('DEBUG', "'%(spec)s' not found"),
+            ('INFO', "Writing '%(spec)s'")
+        )
+
+    def test_update_changes(self):
+        self.check_update(
+            'conda_list_for_update.py',
+            # original spec:
+            '\n'
+            'c=1.0=py2_1\n'
+            '#a comment\n'
+            'a=2=py2_2\n'
+            'b=3=py2_3\n',
+            # expected spec:
+            '\n'
+            'c=1.0=py2_1\n'
+            '#a comment\n'
+            '# a=2=py2_2 removed by picky on 2001-01-02 03:04:05\n'
+            '# b=3=py2_3 updated by picky to 4 on 2001-01-02 03:04:05\n'
+            '# picky added the following on 2001-01-02 03:04:05:\n'
+            'd=5\n'
+            '# picky updated the following on 2001-01-02 03:04:05:\n'
+            'b=4\n',
+            # expected logging:
+            ('INFO', "Using '%(command)s' for conda"),
+            ('INFO', "Using '%(spec)s' for conda"),
+            ('INFO', "Writing '%(spec)s'")
+        )
+
+    def test_update_no_changes(self):
+        requirements_content = '''
+        # we won't update just because of build number!
+        python=2.7.9=12
+        # more junk
+        # junk==1.2.3 removed by picky before
+
+        pip=6.0.8
+'''
+        self.check_update(
+            'conda_list_simple.py',
+            # original spec:
+            requirements_content,
+            # expected spec:
+            requirements_content,
+            # expected logging:
+            ('INFO', "Using '%(command)s' for conda"),
+            ('INFO', "Using '%(spec)s' for conda"),
+            ('DEBUG', "No differences to apply to '%(spec)s'")
+        )
+
+    def test_update_no_command(self):
+        self.check_update(
+            'missing.py',
+            # original spec:
+            None,
+            # expected spec:
+            None,
+            # expected logging:
+            ('DEBUG', "'%(command)s' not found"),
+            ('DEBUG', "'%(spec)s' not found"),
+        )
