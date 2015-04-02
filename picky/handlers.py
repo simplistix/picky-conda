@@ -80,7 +80,7 @@ class Handler(object):
     def update(self, diff, when):
         if self.executable_found:
             if diff:
-                logger.info('Writing %r', self.path)
+                logger.warning('Updating %r', self.path)
                 self.specified.apply(diff, when)
                 with open(self.path, 'w') as target:
                     target.write(self.specified.serialise())

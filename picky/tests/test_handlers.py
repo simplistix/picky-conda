@@ -193,7 +193,7 @@ class PipTests(HandlerTestHelpers, TestCase):
             # expected logging:
             ('INFO', "Using '%(command)s' for pip"),
             ('DEBUG', "'%(spec)s' not found"),
-            ('INFO', "Writing '%(spec)s'")
+            ('WARNING', "Updating '%(spec)s'")
         )
 
     def test_update_changes(self):
@@ -218,7 +218,7 @@ class PipTests(HandlerTestHelpers, TestCase):
             # expected logging:
             ('INFO', "Using '%(command)s' for pip"),
             ('INFO', "Using '%(spec)s' for pip"),
-            ('INFO', "Writing '%(spec)s'")
+            ('WARNING', "Updating '%(spec)s'")
         )
 
     def test_update_no_changes(self):
@@ -327,7 +327,7 @@ class CondaTests(HandlerTestHelpers, TestCase):
             # expected logging:
             ('INFO', "Using '%(command)s' for conda"),
             ('DEBUG', "'%(spec)s' not found"),
-            ('INFO', "Writing '%(spec)s'")
+            ('WARNING', "Updating '%(spec)s'")
         )
 
     def test_update_changes(self):
@@ -352,7 +352,7 @@ class CondaTests(HandlerTestHelpers, TestCase):
             # expected logging:
             ('INFO', "Using '%(command)s' for conda"),
             ('INFO', "Using '%(spec)s' for conda"),
-            ('INFO', "Writing '%(spec)s'")
+            ('WARNING', "Updating '%(spec)s'")
         )
 
     def test_update_no_changes(self):
