@@ -65,16 +65,18 @@ class Requirements(object):
         i = self.map[package]
         original = self.lines[i]
         self.lines[i] = '# {} {}'.format(original, message)
+        del self.map[package]
+        del self.versions[package]
 
     def add_line(self, package, version):
         self.lines.append(self.serialise_line(package, version))
         self.map[package] = len(self.lines)
+        self.versions[package] = version
 
     def remove_line(self, package, when_str):
         self.comment_line(package, 'removed by picky on {}'.format(
             when_str
         ))
-        del self.map[package]
 
     @staticmethod
     def when_str(when):

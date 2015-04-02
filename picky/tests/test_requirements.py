@@ -96,6 +96,9 @@ p4=4
 p3=3.1
 ''', r1.serialise())
 
+        compare(dict(p2='2', p4='4', p3='3.1'), r1.versions)
+        compare(set(['p2', 'p3', 'p4']), set(r1.map))
+
     def test_combine_with(self):
         r1 = requirements('''
 p1=1
@@ -121,5 +124,7 @@ p2=2
 p3=3.1
 p4=4
 ''')
-
-
+        compare(dict(p1='1', p2='2'), r1.versions)
+        compare(set(['p1', 'p2']), set(r1.map))
+        compare(dict(p3='3.1', p4='4'), r2.versions)
+        compare(set(['p3', 'p4']), set(r2.map))
