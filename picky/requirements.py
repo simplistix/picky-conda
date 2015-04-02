@@ -88,7 +88,7 @@ class Requirements(object):
             self.lines.append('# picky added the following on {}:'.format(
                 when_str
             ))
-            for package, version in diff.added.items():
+            for package, version in sorted(diff.added.items()):
                 self.add_line(package, version)
 
         if diff.changed:
@@ -96,7 +96,7 @@ class Requirements(object):
             self.lines.append('# picky updated the following on {}:'.format(
                 when_str
             ))
-            for package, versions in diff.changed.items():
+            for package, versions in sorted(diff.changed.items()):
                 old_version, new_version = versions
                 self.comment_line(
                     package, 'updated by picky to {} on {}'.format(

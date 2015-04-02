@@ -188,8 +188,8 @@ class PipTests(HandlerTestHelpers, TestCase):
             None,
             # expected spec:
             '# picky added the following on 2001-01-02 03:04:05:\n'
-            'testfixtures==4.1.2\n'
-            'picky==0.0.dev0\n',
+            'picky==0.0.dev0\n'
+            'testfixtures==4.1.2\n',
             # expected logging:
             ('INFO', "Using '%(command)s' for pip"),
             ('DEBUG', "'%(spec)s' not found"),
