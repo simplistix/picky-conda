@@ -1,7 +1,7 @@
 |Docs|_
 
 
-.. |Docs| image:: https://readthedocs.org/projects/picky/badge/?version=latest
+.. |Docs| image:: https://readthedocs.org/projects/picky/badge
 .. _Docs: http://picky.readthedocs.org/en/latest/
 
 Picky
