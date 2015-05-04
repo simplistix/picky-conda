@@ -17,7 +17,7 @@ setup(
         "A tool for checking versions of packages used by conda or pip "
         "are as specified in their requirements files."
     ),
-    # long_description=open(os.path.join(base_dir,'docs','description.txt')).read(),
+    long_description=open(os.path.join(base_dir,'docs','description.rst')).read(),
     url='https://github.com/Simplistix/picky',
     classifiers=[
         # 'Development Status :: 5 - Production/Stable',

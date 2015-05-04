@@ -1,18 +1,8 @@
 __pycache__/
 *.py[cod]
-.Python
-env/
 build/
 develop-eggs/
 dist/
-downloads/
-eggs/
-include/
-lib/
-lib64/
-parts/
-sdist/
-var/
 *.egg-info/
 *.egg
 htmlcov/
@@ -21,3 +11,5 @@ htmlcov/
 nosetests.xml
 coverage.xml
 docs/_build/
+desc.html
+include/
