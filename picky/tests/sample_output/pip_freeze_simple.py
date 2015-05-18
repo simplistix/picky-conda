@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import sys
 
-if sys.argv[1:] != ['freeze']:
+if sys.argv[1:] != ['--disable-pip-version-check', 'freeze']:
     raise TypeError(repr(sys.argv))
 
 sys.stdout.write('''\

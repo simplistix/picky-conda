@@ -92,7 +92,7 @@ class Handler(object):
 class PipHandler(Handler):
 
     name = 'pip'
-    args = ('freeze', )
+    args = ('--disable-pip-version-check', 'freeze')
 
     @staticmethod
     def parse_line(line):

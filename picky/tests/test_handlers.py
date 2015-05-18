@@ -80,7 +80,7 @@ class PipTests(HandlerTestHelpers, TestCase):
         )
         self.assertTrue(handler.executable_found)
         self.check_requirements(handler.used,
-                                'pip freeze',
+                                'pip --disable-pip-version-check freeze',
                                 testfixtures='4.1.2',
                                 picky='0.0.dev0')
         self.check_requirements(handler.specified,
@@ -96,7 +96,7 @@ class PipTests(HandlerTestHelpers, TestCase):
         )
         self.assertTrue(handler.executable_found)
         self.check_requirements(handler.used,
-                                'pip freeze',
+                                'pip --disable-pip-version-check freeze',
                                 testfixtures='4.1.2',
                                 picky='0.0.dev0')
         self.check_requirements(handler.specified,
@@ -133,7 +133,7 @@ class PipTests(HandlerTestHelpers, TestCase):
         )
         self.assertTrue(handler.executable_found)
         self.check_requirements(handler.used,
-                                'pip freeze',
+                                'pip --disable-pip-version-check freeze',
                                 testfixtures='4.1.2',
                                 picky='0.0.dev0')
         self.check_requirements(handler.specified,
@@ -156,7 +156,7 @@ class PipTests(HandlerTestHelpers, TestCase):
         )
         self.assertTrue(handler.executable_found)
         self.check_requirements(handler.used,
-                                'pip freeze')
+                                'pip --disable-pip-version-check freeze')
         compare('-e picky==0.0.dev0\n', handler.used.serialise())
 
     def test_git(self):
@@ -167,7 +167,7 @@ class PipTests(HandlerTestHelpers, TestCase):
         )
         self.assertTrue(handler.executable_found)
         self.check_requirements(handler.used,
-                                'pip freeze')
+                                'pip --disable-pip-version-check freeze')
         compare('-e git+https://github.com/Simplistix/picky.git'
                 '@181903dc9a100ead5879ebc0ed81d12145be68d9'
                 '#egg=picky-master\n', handler.used.serialise())

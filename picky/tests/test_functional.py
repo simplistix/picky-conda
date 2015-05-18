@@ -73,7 +73,7 @@ x==1
                        '--pip-requirements', requirements],
                  output="""\
 '{}' found but pip missing
-x 1 missing from pip freeze
+x 1 missing from pip --disable-pip-version-check freeze
 """.format(requirements),
                  return_code=1)
 
@@ -157,8 +157,8 @@ python=3.4.0
                        '--conda', sample_output_path('conda_list_simple.py'),
                        '--conda-versions', conda_versions],
                  output="""\
-testfixtures 4.1.2 in pip freeze but 5 in requirements.txt
-somethingelse 1.0 missing from pip freeze
+testfixtures 4.1.2 in pip --disable-pip-version-check freeze but 5 in requirements.txt
+somethingelse 1.0 missing from pip --disable-pip-version-check freeze
 python 2.7.9 in conda list -e but 3.4.0 in conda-versions.txt
 gonepack 1.0 missing from conda list -e
 """,
@@ -185,8 +185,8 @@ python=3.4.0
                        '--conda-versions', conda_versions,
                        '--update'],
                  output="""\
-testfixtures 4.1.2 in pip freeze but 5 in requirements.txt
-somethingelse 1.0 missing from pip freeze
+testfixtures 4.1.2 in pip --disable-pip-version-check freeze but 5 in requirements.txt
+somethingelse 1.0 missing from pip --disable-pip-version-check freeze
 python 2.7.9 in conda list -e but 3.4.0 in conda-versions.txt
 gonepack 1.0 missing from conda list -e
 Updating '{}'
@@ -286,7 +286,7 @@ c=1.0=3
                        '--conda-versions', conda_versions,
                        '--update'],
                  output="""\
-d 5 missing from pip freeze
+d 5 missing from pip --disable-pip-version-check freeze
 b 4 missing from conda list -e
 Updating '{}'
 Updating '{}'
@@ -342,8 +342,8 @@ testfixtures==5
                        '--conda-versions', self.missing,
                        '--update'],
                  output="""\
-testfixtures 4.1.2 in pip freeze but 5 in requirements.txt
-somethingelse 1.0 missing from pip freeze
+testfixtures 4.1.2 in pip --disable-pip-version-check freeze but 5 in requirements.txt
+somethingelse 1.0 missing from pip --disable-pip-version-check freeze
 Updating '{}'
 """.format(requirements),
                  return_code=1)
