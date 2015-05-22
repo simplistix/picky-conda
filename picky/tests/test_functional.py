@@ -2,28 +2,14 @@ from distutils.spawn import find_executable
 import os
 import re
 from unittest import TestCase
+
 from testfixtures import (
     LogCapture, OutputCapture, Replacer, ShouldRaise, compare,
-    test_datetime, test_time, TempDirectory)
+    test_datetime, TempDirectory
+)
 
 from picky.main import main
-
-# a path to pre-pend to $PATH when we can't activate the conda env and want
-# to run tests, such as PyCharm
 from picky.tests import sample_output_path
-
-binary_dir = os.environ.get('BINARY_DIR')
-
-# where our own spec files are
-config_dir = os.path.join(os.path.dirname(__file__), os.pardir, os.pardir)
-
-
-def search_path():
-    path = os.environ.get('PATH')
-    if binary_dir:
-        path = binary_dir + os.pathsep + path
-    return path
-
 
 def run_main(args=(), output='', return_code=0):
     # so we don't leave log handlers lying around...
@@ -34,19 +20,12 @@ def run_main(args=(), output='', return_code=0):
             # set argv
             argv = ['x'] + args
             r.replace('sys.argv', argv)
-            r.replace('os.environ.PATH', search_path())
             r.replace('picky.main.datetime', test_datetime(2001, 1, 2, 3, 4, 5))
-            # set the working directory
-            cwd = os.getcwd()
-            try:
-                os.chdir(config_dir)
-                # get the exit code
-                with ShouldRaise(SystemExit) as s:
-                    # capture output
-                    with OutputCapture() as actual:
-                        main()
-            finally:
-                os.chdir(cwd)
+            # get the exit code
+            with ShouldRaise(SystemExit) as s:
+                # capture output
+                with OutputCapture() as actual:
+                    main()
 
     # compare output, with timestamp subbed out
     captured = re.sub('[\d\- :]{19}', '(ts)', actual.captured)
@@ -66,27 +45,39 @@ class FunctionalTests(TestCase):
         self.dir.cleanup()
 
     def test_requirements_no_pip(self):
-        requirements = self.dir.write('requirements.txt', '''
+        pip_requirements = self.dir.write('requirements.txt', '''
 x==1
 ''')
+        conda_requirements = self.dir.write('conda_versions.txt', '''
+pip=6.0.8
+python=2.7.9
+''')
         run_main(args=['--pip', self.missing,
-                       '--pip-requirements', requirements],
+                       '--pip-requirements', pip_requirements,
+                       '--conda', sample_output_path('conda_list_simple.py'),
+                       '--conda-versions', conda_requirements],
                  output="""\
 '{}' found but pip missing
 x 1 missing from pip --disable-pip-version-check freeze
-""".format(requirements),
+""".format(pip_requirements),
                  return_code=1)
 
     def test_versions_no_conda(self):
-        requirements = self.dir.write('conda-versions.txt', '''
+        pip_requirements = self.dir.write('requirements.txt', '''
+picky==0.0.dev0
+testfixtures==4.1.2
+''')
+        conda_requirements = self.dir.write('conda-versions.txt', '''
 x=1=2
 ''')
-        run_main(args=['--conda', self.missing,
-                       '--conda-versions', requirements],
+        run_main(args=['--pip', sample_output_path('pip_freeze_simple.py'),
+                       '--pip-requirements', pip_requirements,
+                       '--conda', self.missing,
+                       '--conda-versions', conda_requirements],
                  output="""\
 '{}' found but conda missing
 x 1 missing from conda list -e
-""".format(requirements),
+""".format(conda_requirements),
                  return_code=1)
 
     def test_no_conda_or_pip(self):
@@ -102,23 +93,35 @@ Neither {} nor {} could be found
                  return_code=2)
 
     def test_just_pip(self):
-        # rely on the dev environment's pip and requirements.txt
-        run_main(args=['--conda', self.missing,
+        requirements = self.dir.write('requirements.txt', '''
+picky==0.0.dev0
+testfixtures==4.1.2
+''')
+        run_main(args=['--pip', sample_output_path('pip_freeze_simple.py'),
+                       '--pip-requirements', requirements,
+                       '--conda', self.missing,
                        '--conda-versions', self.missing],
                  output="",
                  return_code=0)
 
     def test_just_conda(self):
-        # rely on the dev environment's conda and conda-versions.txt
+        requirements = self.dir.write('requirements.txt', '''
+pip=6.0.8
+python=2.7.9
+''')
         run_main(args=['--pip', self.missing,
-                       '--pip-requirements', self.missing],
+                       '--pip-requirements', self.missing,
+                       '--conda', sample_output_path('conda_list_simple.py'),
+                       '--conda-versions', requirements],
                  output="",
                  return_code=0)
 
     def test_pip_no_requirements(self):
         requirements = self.dir.getpath('requirements.txt')
         run_main(args=['--pip', sample_output_path('pip_freeze_simple.py'),
-                       '--pip-requirements', requirements],
+                       '--pip-requirements', requirements,
+                       '--conda', self.missing,
+                       '--conda-versions', self.missing],
                  output="""\
 picky 0.0.dev0 missing from requirements.txt
 testfixtures 4.1.2 missing from requirements.txt
@@ -128,7 +131,9 @@ testfixtures 4.1.2 missing from requirements.txt
 
     def test_conda_no_versions(self):
         requirements = self.dir.getpath('conda-versions.txt')
-        run_main(args=['--conda', sample_output_path('conda_list_simple.py'),
+        run_main(args=['--pip', self.missing,
+                       '--conda', self.missing,
+                       '--conda', sample_output_path('conda_list_simple.py'),
                        '--conda-versions', requirements],
                  output="""\
 pip 6.0.8 missing from conda-versions.txt
