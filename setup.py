@@ -38,8 +38,6 @@ setup(
             'nose',
             'nose_fixes',
             'nose-cov',
-            'mock',
-            'manuel',
             ],
         build=['sphinx', 'pkginfo', 'setuptools-git']
     ),
