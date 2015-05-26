@@ -39,7 +39,7 @@ setup(
             'nose_fixes',
             'nose-cov',
             ],
-        build=['sphinx', 'pkginfo', 'setuptools-git']
+        build=['sphinx', 'pkginfo', 'setuptools-git', 'twine']
     ),
     entry_points = {
         'console_scripts': [
