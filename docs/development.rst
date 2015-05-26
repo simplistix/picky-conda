@@ -20,7 +20,7 @@ repository, assuming you have installed conda by following its instructions::
 
   $ conda create -n picky --file=conda_versions.txt
   $ source activate picky
-  (picky) $ pip install -Ur requirements.txt
+  (picky) $ pip install -e .
 
 __ https://pip.pypa.io/en/stable/
 
