@@ -11,12 +11,21 @@ from testfixtures import (
 from picky.main import main
 from picky.tests import sample_output_path
 
+# a path to pre-pend to $PATH when we can't activate the conda env and want
+# to run tests, such as PyCharm
+binary_dir = os.environ.get('BINARY_DIR')
+def search_path():
+    path = os.environ.get('PATH')
+    if binary_dir:
+        path = binary_dir + os.pathsep + path
+    return path
 
 class TestHelpers(object):
 
     def setUp(self):
         self.dir = TempDirectory()
         self.missing = self.dir.getpath('missing')
+        self.path = search_path()
 
     def tearDown(self):
         self.dir.cleanup()
@@ -31,6 +40,8 @@ class TestHelpers(object):
                 argv = ['x'] + args
                 r.replace('sys.argv', argv)
                 r.replace('picky.main.datetime', test_datetime(2001, 1, 2, 3, 4, 5))
+                # set PATH env variable
+                r.replace('os.environ.PATH', self.path)
                 # change to tempdir
                 cwd = os.getcwd()
                 try:
@@ -387,12 +398,19 @@ class SelfTests(TestHelpers, TestCase):
 
     # use our dev environment to test everything for real
 
-    def test_same_info(self):
-        self.run_main(args=[], output='', return_code=0)
-
-    def test_same_debug(self):
-        pip = find_executable('pip', path)
-        conda = find_executable('conda', path)
+    def test_functional(self):
+        # first run, should write files the files
+        # we artificially up the log level so we don't see output
+        # that will be unreliable to test against. (it's tested above!)
+        self.run_main(args=['--update', '-l', 'ERROR'],
+                      output='',
+                      return_code=1)
+        # now we should have two config files
+        self.dir.check('conda_versions.txt', 'requirements.txt')
+        # running again, even in debug, should give no unexpected
+        # output
+        pip = find_executable('pip', self.path)
+        conda = find_executable('conda', self.path)
         self.run_main(args=['-l', 'debug'],
                       output='''\
 (ts) INFO    Using '{}' for pip
@@ -400,4 +418,4 @@ class SelfTests(TestHelpers, TestCase):
 (ts) INFO    Using '{}' for conda
 (ts) INFO    Using 'conda_versions.txt' for conda
 '''.format(pip, conda),
-                 return_code=0)
+                      return_code=0)
