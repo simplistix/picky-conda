@@ -23,7 +23,7 @@ install:
 
   - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION --file conda_versions.txt
   - source activate test-environment
-  - pip install -e .
+  - pip install -e .[test]
 
 script: nosetests --with-cov --cov=picky
 
