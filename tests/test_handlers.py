@@ -7,7 +7,7 @@ from testfixtures import Comparison as C, LogCapture, OutputCapture, compare, \
 
 from picky.handlers import CondaHandler, PipHandler, Handler
 from picky.requirements import Requirements, Diff
-from picky.tests import sample_output_path
+from tests import sample_output_path
 
 
 class HandlerTestHelpers(object):

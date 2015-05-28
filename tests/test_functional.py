@@ -9,7 +9,8 @@ from testfixtures import (
 )
 
 from picky.main import main
-from picky.tests import sample_output_path
+from tests import sample_output_path
+
 
 # a path to pre-pend to $PATH when we can't activate the conda env and want
 # to run tests, such as PyCharm
