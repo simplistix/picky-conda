@@ -79,7 +79,3 @@ def main():
         conda.update(conda_diff, now)
 
     exit_with_code(conda_diff, pip_diff)
-
-
-if __name__ == '__main__':
-    main()
