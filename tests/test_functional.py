@@ -66,10 +66,10 @@ class TestHelpers(object):
 class FunctionalTests(TestHelpers, TestCase):
     
     def test_requirements_no_pip(self):
-        pip_requirements = self.dir.write('requirements.txt', '''
+        pip_requirements = self.dir.write('requirements.txt', b'''
 x==1
 ''')
-        conda_requirements = self.dir.write('conda_versions.txt', '''
+        conda_requirements = self.dir.write('conda_versions.txt', b'''
 pip=6.0.8
 python=2.7.9
 ''')
@@ -84,11 +84,11 @@ x 1 missing from pip --disable-pip-version-check freeze
                       return_code=1)
 
     def test_versions_no_conda(self):
-        pip_requirements = self.dir.write('requirements.txt', '''
+        pip_requirements = self.dir.write('requirements.txt', b'''
 picky==0.0.dev0
 testfixtures==4.1.2
 ''')
-        conda_requirements = self.dir.write('conda-versions.txt', '''
+        conda_requirements = self.dir.write('conda-versions.txt', b'''
 x=1=2
 ''')
         self.run_main(args=['--pip', sample_output_path('pip_freeze_simple.py'),
@@ -114,7 +114,7 @@ Neither {0} nor {1} could be found
                       return_code=2)
 
     def test_just_pip(self):
-        requirements = self.dir.write('requirements.txt', '''
+        requirements = self.dir.write('requirements.txt', b'''
 picky==0.0.dev0
 testfixtures==4.1.2
 ''')
@@ -126,7 +126,7 @@ testfixtures==4.1.2
                       return_code=0)
 
     def test_just_conda(self):
-        requirements = self.dir.write('requirements.txt', '''
+        requirements = self.dir.write('requirements.txt', b'''
 pip=6.0.8
 python=2.7.9
 ''')
@@ -164,12 +164,12 @@ python 2.7.9 missing from conda-versions.txt
         self.dir.check()
 
     def test_different(self):
-        requirements_content = """
+        requirements_content = b"""
 picky==0.0.dev0
 somethingelse==1.0
 testfixtures==5
 """
-        conda_versions_content = """
+        conda_versions_content = b"""
 gonepack=1.0
 pip=6.0.8
 python=3.4.0
@@ -194,12 +194,12 @@ gonepack 1.0 missing from conda list -e
         compare(conda_versions_content, self.dir.read('conda-versions.txt'))
 
     def test_update(self):
-        requirements = self.dir.write('requirements.txt', """
+        requirements = self.dir.write('requirements.txt', b"""
 picky==0.0.dev0
 somethingelse==1.0
 testfixtures==5
 """)
-        conda_versions = self.dir.write('conda-versions.txt',"""
+        conda_versions = self.dir.write('conda-versions.txt', b"""
 gonepack=1.0
 pip=6.0.8
 python=3.4.0
@@ -220,7 +220,7 @@ Updating '{1}'
 """.format(requirements, conda_versions),
                       return_code=1)
         # check no changes!
-        compare("""
+        compare(b"""
 picky==0.0.dev0
 # somethingelse==1.0 removed by picky on 2001-01-02 03:04:05
 # testfixtures==5 updated by picky to 4.1.2 on 2001-01-02 03:04:05
@@ -228,7 +228,7 @@ picky==0.0.dev0
 testfixtures==4.1.2
 """, self.dir.read('requirements.txt'))
 
-        compare("""
+        compare(b"""
 # gonepack=1.0 removed by picky on 2001-01-02 03:04:05
 pip=6.0.8
 # python=3.4.0 updated by picky to 2.7.9 on 2001-01-02 03:04:05
@@ -253,13 +253,13 @@ Updating '{0}'
 Updating '{1}'
 """.format(requirements, conda_versions),
                       return_code=1)
-        compare("""\
+        compare(b"""\
 # picky added the following on 2001-01-02 03:04:05:
 picky==0.0.dev0
 testfixtures==4.1.2
 """, self.dir.read('requirements.txt'))
 
-        compare("""\
+        compare(b"""\
 # picky added the following on 2001-01-02 03:04:05:
 pip=6.0.8
 python=2.7.9
@@ -281,24 +281,24 @@ Updating '{0}'
 Updating '{1}'
 """.format(requirements, conda_versions),
                       return_code=1)
-        compare("""\
+        compare(b"""\
 # picky added the following on 2001-01-02 03:04:05:
 b==4.1
 """, self.dir.read('requirements.txt'))
 
-        compare("""\
+        compare(b"""\
 # picky added the following on 2001-01-02 03:04:05:
 c=1.0
 d=5
 """, self.dir.read('conda-versions.txt'))
 
     def test_combine_changes_both_update(self):
-        requirements = self.dir.write('requirements.txt', '''
+        requirements = self.dir.write('requirements.txt', b'''
 d==5
 # some other comment
 b==4.1
 ''')
-        conda_versions = self.dir.write('conda-versions.txt', '''
+        conda_versions = self.dir.write('conda-versions.txt', b'''
 # This file may be used to create an environment using:
 # $ conda create --name <env> --file <this file>
 # platform: osx-64
@@ -318,13 +318,13 @@ Updating '{0}'
 Updating '{1}'
 """.format(requirements, conda_versions),
                       return_code=1)
-        compare("""
+        compare(b"""
 # d==5 removed by picky on 2001-01-02 03:04:05
 # some other comment
 b==4.1
 """, self.dir.read('requirements.txt'))
 
-        compare("""
+        compare(b"""
 # This file may be used to create an environment using:
 # $ conda create --name <env> --file <this file>
 # platform: osx-64
@@ -334,10 +334,10 @@ c=1.0=3
 """, self.dir.read('conda-versions.txt'))
 
     def test_changes_nothing(self):
-        requirements_content = '''
+        requirements_content = b'''
 b==4.1
 '''
-        conda_content = '''
+        conda_content = b'''
 c=1.0
 d=5
 '''
@@ -356,7 +356,7 @@ d=5
         compare(conda_content, self.dir.read('conda-versions.txt'))
 
     def test_update_pip_conda_missing(self):
-        requirements = self.dir.write('requirements.txt', """
+        requirements = self.dir.write('requirements.txt', b"""
 picky==0.0.dev0
 somethingelse==1.0
 testfixtures==5
@@ -374,7 +374,7 @@ Updating '{0}'
 """.format(requirements),
                       return_code=1)
         # check changes written:
-        compare("""
+        compare(b"""
 picky==0.0.dev0
 # somethingelse==1.0 removed by picky on 2001-01-02 03:04:05
 # testfixtures==5 updated by picky to 4.1.2 on 2001-01-02 03:04:05

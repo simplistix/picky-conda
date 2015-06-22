@@ -30,12 +30,18 @@ class Handler(object):
         else:
             logger.debug('%r not found', param)
             text = ''
+
+        if isinstance(text, bytes):
+            text = text.decode('ascii')
+
         return self.requirements(text, source)
 
     def run_command(self, command):
         process = Popen((command, )+self.args, stdout=PIPE, stderr=PIPE)
         stdout, stderr = process.communicate()
         if stderr:
+            if isinstance(stderr, bytes):
+                stderr = stderr.decode('ascii')
             logger.error('%s gave errors: %s', self.name, stderr)
         return stdout
 

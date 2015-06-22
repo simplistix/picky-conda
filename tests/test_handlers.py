@@ -51,7 +51,7 @@ class HandlerTestHelpers(object):
         spec_name = 'spec.txt'
         with TempDirectory() as dir:
             if original_spec:
-                dir.write(spec_name, original_spec)
+                dir.write(spec_name, original_spec, 'ascii')
             with LogCapture() as log:
                 spec_path = dir.getpath(spec_name)
                 command_path, handler = self.make_handler(
@@ -60,7 +60,7 @@ class HandlerTestHelpers(object):
                 diff = Diff(handler.specified, handler.used)
                 handler.update(diff, datetime(2001, 1, 2, 3, 4, 5))
                 if os.path.exists(spec_path):
-                    actual_spec = dir.read(spec_name)
+                    actual_spec = dir.read(spec_name, 'ascii')
                 else:
                     actual_spec = None
                 compare(expected_spec, actual_spec)
