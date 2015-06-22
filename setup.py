@@ -13,7 +13,7 @@ if sys.version_info[:2] == (2, 6):
 
 setup(
     name='picky',
-    version='0.0.dev0',
+    version='0.8',
     author='Chris Withers',
     author_email='chris@simplistix.co.uk',
     license='MIT',
@@ -44,7 +44,7 @@ setup(
             'nose_fixes',
             'nose-cov',
             ],
-        build=['sphinx', 'pkginfo', 'setuptools-git', 'twine']
+        build=['sphinx', 'pkginfo', 'setuptools-git', 'twine', 'wheel']
     ),
     entry_points = {
         'console_scripts': [

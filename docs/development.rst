@@ -55,7 +55,7 @@ The following should be done with your conda environment activated and will
 build the distribution, upload it to PyPI and register
 the metadata with PyPI::
 
-  $ pip install -e .
+  $ pip install -e .[build,test]
   $ python setup.py sdist bdist_wheel
   $ twine upload dist/picky-<version>*
 
