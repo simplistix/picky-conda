@@ -25,7 +25,4 @@ install:
   - source activate test-environment
   - pip install -e .[test]
 
-script: nosetests --with-cov --cov=picky
-
-after_success:
-  - coveralls
+script: nosetests
