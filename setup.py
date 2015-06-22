@@ -13,7 +13,7 @@ if sys.version_info[:2] == (2, 6):
 
 setup(
     name='picky',
-    version='0.8',
+    version='0.9',
     author='Chris Withers',
     author_email='chris@simplistix.co.uk',
     license='MIT',
