@@ -7,6 +7,10 @@ from setuptools import setup, find_packages
 
 base_dir = os.path.dirname(__file__)
 
+install_requires = []
+if sys.version_info[:2] == (2, 6):
+    install_requires.append('argparse')
+
 setup(
     name='picky',
     version='0.0.dev0',
@@ -32,6 +36,7 @@ setup(
     packages=find_packages(),
     zip_safe=False,
     include_package_data=True,
+    install_requires=install_requires,
     extras_require=dict(
         test=[
             'testfixtures',

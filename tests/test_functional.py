@@ -78,7 +78,7 @@ python=2.7.9
                             '--conda', sample_output_path('conda_list_simple.py'),
                             '--conda-versions', conda_requirements],
                       output="""\
-'{}' found but pip missing
+'{0}' found but pip missing
 x 1 missing from pip --disable-pip-version-check freeze
 """.format(pip_requirements),
                       return_code=1)
@@ -96,7 +96,7 @@ x=1=2
                             '--conda', self.missing,
                             '--conda-versions', conda_requirements],
                       output="""\
-'{}' found but conda missing
+'{0}' found but conda missing
 x 1 missing from conda list -e
 """.format(conda_requirements),
                       return_code=1)
@@ -109,7 +109,7 @@ x 1 missing from conda list -e
                             '--pip-requirements', self.missing,
                             '--conda-versions', self.missing],
                       output="""\
-Neither {} nor {} could be found
+Neither {0} nor {1} could be found
 """.format(pip_missing, conda_missing),
                       return_code=2)
 
@@ -215,8 +215,8 @@ testfixtures 4.1.2 in pip --disable-pip-version-check freeze but 5 in requiremen
 somethingelse 1.0 missing from pip --disable-pip-version-check freeze
 python 2.7.9 in conda list -e but 3.4.0 in conda-versions.txt
 gonepack 1.0 missing from conda list -e
-Updating '{}'
-Updating '{}'
+Updating '{0}'
+Updating '{1}'
 """.format(requirements, conda_versions),
                       return_code=1)
         # check no changes!
@@ -249,8 +249,8 @@ picky 0.0.dev0 missing from requirements.txt
 testfixtures 4.1.2 missing from requirements.txt
 pip 6.0.8 missing from conda-versions.txt
 python 2.7.9 missing from conda-versions.txt
-Updating '{}'
-Updating '{}'
+Updating '{0}'
+Updating '{1}'
 """.format(requirements, conda_versions),
                       return_code=1)
         compare("""\
@@ -277,8 +277,8 @@ python=2.7.9
 b 4.1 missing from requirements.txt
 c 1.0 missing from conda-versions.txt
 d 5 missing from conda-versions.txt
-Updating '{}'
-Updating '{}'
+Updating '{0}'
+Updating '{1}'
 """.format(requirements, conda_versions),
                       return_code=1)
         compare("""\
@@ -314,8 +314,8 @@ c=1.0=3
                       output="""\
 d 5 missing from pip --disable-pip-version-check freeze
 b 4 missing from conda list -e
-Updating '{}'
-Updating '{}'
+Updating '{0}'
+Updating '{1}'
 """.format(requirements, conda_versions),
                       return_code=1)
         compare("""
@@ -370,7 +370,7 @@ testfixtures==5
                       output="""\
 testfixtures 4.1.2 in pip --disable-pip-version-check freeze but 5 in requirements.txt
 somethingelse 1.0 missing from pip --disable-pip-version-check freeze
-Updating '{}'
+Updating '{0}'
 """.format(requirements),
                       return_code=1)
         # check changes written:
@@ -414,9 +414,9 @@ class SelfTests(TestHelpers, TestCase):
         conda = find_executable('conda', self.path)
         self.run_main(args=['-l', 'debug'],
                       output='''\
-(ts) INFO    Using '{}' for pip
+(ts) INFO    Using '{0}' for pip
 (ts) INFO    Using 'requirements.txt' for pip
-(ts) INFO    Using '{}' for conda
+(ts) INFO    Using '{1}' for conda
 (ts) INFO    Using 'conda_versions.txt' for conda
 '''.format(pip, conda),
                       return_code=0)

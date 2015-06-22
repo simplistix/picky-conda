@@ -64,7 +64,7 @@ class Requirements(object):
     def comment_line(self, package, message):
         i = self.map[package]
         original = self.lines[i]
-        self.lines[i] = '# {} {}'.format(original, message)
+        self.lines[i] = '# {0} {1}'.format(original, message)
         del self.map[package]
         del self.versions[package]
 
@@ -74,7 +74,7 @@ class Requirements(object):
         self.versions[package] = version
 
     def remove_line(self, package, when_str):
-        self.comment_line(package, 'removed by picky on {}'.format(
+        self.comment_line(package, 'removed by picky on {0}'.format(
             when_str
         ))
 
@@ -87,7 +87,7 @@ class Requirements(object):
         when_str = self.when_str(when)
 
         if diff.added:
-            self.lines.append('# picky added the following on {}:'.format(
+            self.lines.append('# picky added the following on {0}:'.format(
                 when_str
             ))
             for package, version in sorted(diff.added.items()):
@@ -95,13 +95,13 @@ class Requirements(object):
 
         if diff.changed:
 
-            self.lines.append('# picky updated the following on {}:'.format(
+            self.lines.append('# picky updated the following on {0}:'.format(
                 when_str
             ))
             for package, versions in sorted(diff.changed.items()):
                 old_version, new_version = versions
                 self.comment_line(
-                    package, 'updated by picky to {} on {}'.format(
+                    package, 'updated by picky to {0} on {1}'.format(
                     new_version, when_str
                 ))
                 self.add_line(package, new_version)
