@@ -1,5 +1,7 @@
-|Docs|_
+|Travis|_ |Docs|_
 
+.. |Travis| image:: https://api.travis-ci.org/Simplistix/picky.png?branch=master
+.. _Travis: https://travis-ci.org/Simplistix/picky
 
 .. |Docs| image:: https://readthedocs.org/projects/picky/badge
 .. _Docs: http://picky.readthedocs.org/en/latest/
