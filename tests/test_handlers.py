@@ -178,6 +178,12 @@ class PipTests(HandlerTestHelpers, TestCase):
     def test_parse_post_comment(self):
         compare(('foo', '1.0'), self.class_.parse_line(' foo == 1.0 #barrr'))
 
+    def test_arbitrary_equality_clause(self):
+            compare(('foo', '1.0'), self.class_.parse_line('foo===1.0'))
+
+    def test_feature(self):
+        compare(('foo', '1.0'), self.class_.parse_line('foo[bar]==1.0'))
+
     def test_serialise(self):
         compare('foo==1.0', self.class_.serialise_line('foo', '1.0'))
 

@@ -1,6 +1,7 @@
 from distutils.spawn import find_executable
 from logging import getLogger
 import os
+import re
 from subprocess import Popen, PIPE
 
 from picky.requirements import Requirements
@@ -93,12 +94,16 @@ class PipHandler(Handler):
 
     name = 'pip'
     args = ('--disable-pip-version-check', 'freeze')
+    pattern = re.compile('(.+?)(\[.+?\])? *={1,3}(.+)')
 
-    @staticmethod
-    def parse_line(line):
+    @classmethod
+    def parse_line(cls, line):
         line = line.split('#')[0]
-        if '==' in line and not line.startswith('-e '):
-            return (p.strip() for p in line.split('=='))
+        match = cls.pattern.match(line)
+        if match:
+            package, features, version = match.groups()
+            if '-e ' not in package:
+                return package.strip(), version.strip()
 
     @staticmethod
     def serialise_line(name, version):
