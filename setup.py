@@ -7,10 +7,6 @@ from setuptools import setup, find_packages
 
 base_dir = os.path.dirname(__file__)
 
-install_requires = []
-if sys.version_info[:2] == (2, 6):
-    install_requires.append('argparse')
-
 setup(
     name='picky',
     version='0.9',
@@ -37,16 +33,16 @@ setup(
     packages=find_packages(),
     zip_safe=False,
     include_package_data=True,
-    install_requires=install_requires,
-    extras_require=dict(
-        test=[
+    extras_require={
+        ':python_version=="2.6"': ['argparse'],
+        'test': [
             'testfixtures',
             'nose',
             'nose_fixes',
             'nose-cov',
             ],
-        build=['sphinx', 'pkginfo', 'setuptools-git', 'twine', 'wheel']
-    ),
+        'build': ['sphinx', 'pkginfo', 'setuptools-git', 'twine', 'wheel']
+},
     entry_points = {
         'console_scripts': [
             'picky = picky.main:main',
