@@ -3,6 +3,7 @@ from logging import getLogger
 import os
 import re
 from subprocess import Popen, PIPE
+import sys
 
 from picky.requirements import Requirements
 
@@ -13,6 +14,7 @@ logger = getLogger(__name__)
 class Handler(object):
 
     args = ()
+    prefix_args = () # for things like --disable-pip-version-check
     name = None
 
     @staticmethod
@@ -36,12 +38,16 @@ class Handler(object):
 
         return self.requirements(text, source)
 
-    def run_command(self, command):
-        process = Popen((command, )+self.args, stdout=PIPE, stderr=PIPE)
+    def raw_run(self, args):
+        process = Popen(args, stdout=PIPE, stderr=PIPE)
         stdout, stderr = process.communicate()
+        if isinstance(stderr, bytes):
+            stderr = stderr.decode('ascii')
+        return stdout, stderr
+
+    def run_command(self, command):
+        stdout, stderr = self.raw_run((command, )+self.prefix_args+self.args)
         if stderr:
-            if isinstance(stderr, bytes):
-                stderr = stderr.decode('ascii')
             logger.error('%s gave errors: %s', self.name, stderr)
         return stdout
 
@@ -99,7 +105,7 @@ class Handler(object):
 class PipHandler(Handler):
 
     name = 'pip'
-    args = ('--disable-pip-version-check', 'freeze')
+    args = ('freeze', )
     pattern = re.compile('(.+?)(\[.+?\])? *={1,3}(.+)')
 
     @classmethod
@@ -114,6 +120,16 @@ class PipHandler(Handler):
     @staticmethod
     def serialise_line(name, version):
         return name + '==' + version
+
+    def find_executable(self, command):
+        exists, executable = super(PipHandler, self).find_executable(command)
+        if exists:
+            stdout, stderr = self.raw_run(
+                (command,  '--disable-pip-version-check', '--version')
+            )
+            if 'no such option: --disable-pip-version-check' not in stderr:
+                self.prefix_args = ('--disable-pip-version-check', )
+        return exists, executable
 
 
 class CondaHandler(Handler):

@@ -79,7 +79,7 @@ python=2.7.9
                             '--conda-versions', conda_requirements],
                       output="""\
 '{0}' found but pip missing
-x 1 missing from pip --disable-pip-version-check freeze
+x 1 missing from pip freeze
 """.format(pip_requirements),
                       return_code=1)
 
@@ -119,6 +119,18 @@ picky==0.0.dev0
 testfixtures==4.1.2
 ''')
         self.run_main(args=['--pip', sample_output_path('pip_freeze_simple.py'),
+                            '--pip-requirements', requirements,
+                            '--conda', self.missing,
+                            '--conda-versions', self.missing],
+                      output="",
+                      return_code=0)
+
+    def test_just_old_pip(self):
+        requirements = self.dir.write('requirements.txt', b'''
+picky==0.0.dev0
+testfixtures==4.1.2
+''')
+        self.run_main(args=['--pip', sample_output_path('pip_freeze_old.py'),
                             '--pip-requirements', requirements,
                             '--conda', self.missing,
                             '--conda-versions', self.missing],
@@ -183,8 +195,8 @@ python=3.4.0
                             '--conda', sample_output_path('conda_list_simple.py'),
                             '--conda-versions', conda_versions],
                       output="""\
-testfixtures 4.1.2 in pip --disable-pip-version-check freeze but 5 in requirements.txt
-somethingelse 1.0 missing from pip --disable-pip-version-check freeze
+testfixtures 4.1.2 in pip freeze but 5 in requirements.txt
+somethingelse 1.0 missing from pip freeze
 python 2.7.9 in conda list -e but 3.4.0 in conda-versions.txt
 gonepack 1.0 missing from conda list -e
 """,
@@ -211,8 +223,8 @@ python=3.4.0
                             '--conda-versions', conda_versions,
                             '--update'],
                       output="""\
-testfixtures 4.1.2 in pip --disable-pip-version-check freeze but 5 in requirements.txt
-somethingelse 1.0 missing from pip --disable-pip-version-check freeze
+testfixtures 4.1.2 in pip freeze but 5 in requirements.txt
+somethingelse 1.0 missing from pip freeze
 python 2.7.9 in conda list -e but 3.4.0 in conda-versions.txt
 gonepack 1.0 missing from conda list -e
 Updating '{0}'
@@ -312,7 +324,7 @@ c=1.0=3
                             '--conda-versions', conda_versions,
                             '--update'],
                       output="""\
-d 5 missing from pip --disable-pip-version-check freeze
+d 5 missing from pip freeze
 b 4 missing from conda list -e
 Updating '{0}'
 Updating '{1}'
@@ -368,8 +380,8 @@ testfixtures==5
                             '--conda-versions', self.missing,
                             '--update'],
                       output="""\
-testfixtures 4.1.2 in pip --disable-pip-version-check freeze but 5 in requirements.txt
-somethingelse 1.0 missing from pip --disable-pip-version-check freeze
+testfixtures 4.1.2 in pip freeze but 5 in requirements.txt
+somethingelse 1.0 missing from pip freeze
 Updating '{0}'
 """.format(requirements),
                       return_code=1)
