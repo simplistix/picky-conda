@@ -3,7 +3,6 @@ from logging import getLogger
 import os
 import re
 from subprocess import Popen, PIPE
-import sys
 
 from picky.requirements import Requirements
 
