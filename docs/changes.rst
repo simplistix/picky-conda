@@ -26,8 +26,3 @@ Changes
 ------------------
 
 - Initial Release
-
-Still to Come
-=============
-
-- Automated code coverage metrics
