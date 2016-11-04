@@ -28,7 +28,7 @@ install:
   - source activate test-environment
   - pip install -e .[test]
 
-script: nosetests --with-cov --cov=picky
+script: coverage run -m nose
 
 after_success:
   - coverage combine
