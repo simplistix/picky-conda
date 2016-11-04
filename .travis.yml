@@ -31,5 +31,4 @@ install:
 script: coverage run -m nose
 
 after_success:
-  - coverage combine
   - coveralls
