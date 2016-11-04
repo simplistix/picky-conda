@@ -17,11 +17,11 @@ class Handler(object):
     name = None
 
     @staticmethod
-    def parse_line(line):
+    def parse_line(line):  # pragma: no cover
         raise NotImplementedError
 
     @staticmethod
-    def serialise_line(name, version):
+    def serialise_line(name, version):  # pragma: no cover
         raise NotImplementedError
 
     def read_source(self, if_, callable_, param, source):

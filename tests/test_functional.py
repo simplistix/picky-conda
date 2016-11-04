@@ -15,9 +15,11 @@ from tests import sample_output_path
 # a path to pre-pend to $PATH when we can't activate the conda env and want
 # to run tests, such as PyCharm
 binary_dir = os.environ.get('BINARY_DIR')
+
+
 def search_path():
     path = os.environ.get('PATH')
-    if binary_dir:
+    if binary_dir:  # pragma: no cover
         path = binary_dir + os.pathsep + path
     return path
 
