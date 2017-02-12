@@ -1,7 +1,7 @@
 |Travis|_ |Docs|_
 
 .. |Travis| image:: https://api.travis-ci.org/Simplistix/picky-conda.svg?branch=master
-.. _Travis: https://travis-ci.org/Simplistix/picky
+.. _Travis: https://travis-ci.org/Simplistix/picky-conda
 
 .. |Coveralls| image:: https://coveralls.io/repos/Simplistix/picky-conda/badge.svg?branch=master
 .. _Coveralls: https://coveralls.io/r/Simplistix/picky-conda?branch=master
@@ -32,7 +32,7 @@ Installation
 
 Do the following in your virtualenv or conda environment::
 
-  pip install picky
+  pip install picky-conda
   
 Documentation
 =============
@@ -46,5 +46,3 @@ Problems?
 =========
 
 - Ask a question on http://groups.google.com/group/simplistix/
-
-
