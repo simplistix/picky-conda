@@ -12,7 +12,7 @@ extensions = [
 source_suffix = '.rst'
 master_doc = 'index'
 project = pkg_info.name
-copyright = '%s Simplistix Ltd' % datetime.datetime.now().year
+copyright = '%s Chris Withers' % datetime.datetime.now().year
 version = release = pkg_info.version
 exclude_patterns = [
     'description.rst',
@@ -27,6 +27,6 @@ htmlhelp_basename = project+'doc'
 # Options for LaTeX output
 latex_documents = [
   ('index',project+'.tex', project+u' Documentation',
-   'Simplistix Ltd', 'manual'),
+   'Chris Withers', 'manual'),
 ]
 

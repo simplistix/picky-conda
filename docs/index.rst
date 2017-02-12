@@ -1,6 +1,10 @@
 Picky documentation
 ===================
 
+.. warning::
+
+  This projects is currently awaiting development, do not use yet!
+
 Picky is a tool for making sure that the packages you have installed
 with `pip`__ or `conda`__ match those you have specified.
 
