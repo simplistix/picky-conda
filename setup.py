@@ -18,7 +18,7 @@ setup(
         "are as specified in their requirements files."
     ),
     long_description=open(os.path.join(base_dir,'docs','description.rst')).read(),
-    url='https://github.com/Simplistix/picky',
+    url='https://github.com/Simplistix/picky-conda',
     classifiers=[
         # 'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
