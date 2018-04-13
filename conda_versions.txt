@@ -1,8 +1,0 @@
-python
-openssl
-pip
-readline
-setuptools
-sqlite
-tk
-zlib
