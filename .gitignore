@@ -7,7 +7,7 @@ dist/
 *.egg
 htmlcov/
 .coverage
-.cache
+.*cache
 nosetests.xml
 coverage.xml
 docs/_build/
