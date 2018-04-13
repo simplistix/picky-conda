@@ -12,6 +12,9 @@ extensions = [
 source_suffix = '.rst'
 master_doc = 'index'
 project = pkg_info.name
+first_year = 2017
+current_year = datetime.datetime.now().year
+copyright = (str(current_year) if current_year==first_year else ('%s-%s'%(first_year,current_year)))+' Chris Withers'
 copyright = '%s Chris Withers' % datetime.datetime.now().year
 version = release = pkg_info.version
 exclude_patterns = [

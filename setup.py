@@ -1,6 +1,3 @@
-# See license.txt for license details.
-# Copyright (c) 2015 Simplistix Ltd
-
 import os, sys
 
 from setuptools import setup, find_packages
