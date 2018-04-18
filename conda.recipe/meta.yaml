@@ -1,0 +1,38 @@
+{% set data = load_setup_py_data() %}
+
+package:
+  name: picky-conda
+  version: "{{ data['version'] }}"
+
+source:
+  path: .
+
+build:
+  entry_points:
+    {% for script in data['entry_points']['console_scripts'] %}
+    - {{ script }}
+    {% endfor %}
+  script: python setup.py install
+  noarch: python
+
+requirements:
+  build:
+    - python
+  run:
+    - python
+    {% for dep in data['install_requires'] %}
+    - {{ dep.lower() }}
+    {% endfor %}
+
+test:
+  commands:
+    - picky -h
+
+about:
+  summary: "{{ data['description'] }}"
+  description: "{{ data['description'] }}"
+  home: "{{ data['url'] }}"
+  license: "{{ data['license'] }}"
+
+extra:
+  recipe-maintainers: "{{ data['author'] }} <{{ data['author_email'] }}>"

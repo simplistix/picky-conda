@@ -1,0 +1,13 @@
+name: test-environment
+channels:
+- defaults
+- conda-forge
+dependencies:
+- pytest
+- testfixtures
+- coveralls
+- sphinx
+- pkginfo
+- pyyaml
+- pip:
+  - -e .
