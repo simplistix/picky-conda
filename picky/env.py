@@ -1,4 +1,7 @@
+from __future__ import print_function
+
 from collections import OrderedDict
+from difflib import unified_diff
 
 from .oyaml import safe_load, safe_dump
 
@@ -45,7 +48,9 @@ class Environment(dict):
 
     def to_string(self):
         output = OrderedDict()
-        output['name'] = self['name']
+        name = self.get('name')
+        if name:
+            output['name'] = name
         output['channels'] = self['channels']
         output['dependencies'] = deps = []
         for spec in self['conda'].values():
@@ -79,3 +84,16 @@ def modify(env, ignore=None, develop=None):
     return env
 
 
+def diff(expected, actual):
+    envs = []
+    for env in expected, actual:
+        env = env.copy()
+        del env['name']
+        envs.append(env.to_string().split('\n'))
+    udiff = '\n'.join(unified_diff(
+        *envs, lineterm='', fromfile='expected', tofile='actual'
+    ))
+    if udiff:
+        print('Expected environment does not match actual:')
+        print(udiff)
+    return 1 if udiff else 0

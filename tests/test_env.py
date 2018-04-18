@@ -1,8 +1,9 @@
 from collections import OrderedDict
+from textwrap import dedent
 
-from testfixtures import compare
+from testfixtures import compare, OutputCapture
 
-from picky.env import Environment, PackageSpec, modify
+from picky.env import Environment, PackageSpec, modify, diff
 
 sample_serialized = """\
 name: package
@@ -22,7 +23,6 @@ dependencies:
 sample_export = sample_serialized + """\
 prefix: /Users/chris/anaconda2/envs/picky-conda
 """
-
 
 
 sample_env = Environment({
@@ -116,3 +116,54 @@ class TestFilter(object):
                         ('urllib3', PackageSpec('==', 'urllib3', '1.22', None)),
                     ]),
                 }))
+
+
+class TestDiff(object):
+
+    def test_same(self):
+        with OutputCapture() as output:
+            result = diff(sample_env, sample_env)
+        assert result == 0
+        output.compare('')
+
+    def test_name_different(self):
+        other_env = sample_env.copy()
+        other_env['name'] = 'other'
+        with OutputCapture() as output:
+            result = diff(sample_env, other_env)
+        assert result == 0
+        output.compare('')
+
+    def test_others_different(self):
+        other_env = Environment({
+            'name': 'package',
+            'channels': ['conda-forge'],
+            'conda': OrderedDict([
+                ('ca-certificates', PackageSpec('=', 'ca-certificates', '2018.03.07', '0')),
+                ('libcxx', PackageSpec('=', 'libcxx', '4.0.1', 'h579ed51_0')),
+            ]),
+            'pip': OrderedDict([
+                ('alabaster', PackageSpec('==', 'alabaster', '0.7.10', None)),
+                ('urllib3', PackageSpec('==', 'urllib3', '1.22', None)),
+            ]),
+        })
+        with OutputCapture() as output:
+            result = diff(sample_env, other_env)
+        assert result == 1
+        output.compare(dedent("""\
+            Expected environment does not match actual:
+            --- expected
+            +++ actual
+            @@ -1,12 +1,9 @@
+             channels:
+            -- defaults
+             - conda-forge
+             dependencies:
+             - ca-certificates=2018.03.07=0
+            -- certifi=2018.1.18=py36_0
+             - libcxx=4.0.1=h579ed51_0
+             - pip:
+               - alabaster==0.7.10
+            -  - attrs==17.4.0
+               - urllib3==1.22
+            """))
