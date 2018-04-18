@@ -44,8 +44,8 @@ install:
 # Useful for debugging any issues with conda
 - conda info -a
 # create the test env
-- conda env create -q python=$CONDAPY --file environment.yml
-- source activate test-environment
+- conda env create -q python=$CONDAPY --file environment.yaml
+- conda activate test-environment
 
 script:
 - conda build -q conda.recipe
