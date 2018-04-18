@@ -1,8 +1,6 @@
-import os
 from collections import OrderedDict
-from subprocess import check_output
 
-from .oyaml import safe_load, dump
+from .oyaml import safe_load, safe_dump
 
 
 class PackageSpec(object):
@@ -58,4 +56,4 @@ class Environment(dict):
             deps.append({'pip': pip_deps})
             for spec in pip_specs.values():
                 pip_deps.append(str(spec))
-        return dump(output, default_flow_style=False)
+        return safe_dump(output, default_flow_style=False)

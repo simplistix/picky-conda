@@ -42,6 +42,7 @@ def map_constructor(loader, node):
 
 pyyaml.add_representer(dict, map_representer)
 pyyaml.add_representer(OrderedDict, map_representer)
+pyyaml.add_representer(OrderedDict, map_representer, Dumper=pyyaml.dumper.SafeDumper)
 
 
 if sys.version_info < (3, 7):
