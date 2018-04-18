@@ -2,7 +2,7 @@ from collections import OrderedDict
 
 from testfixtures import compare
 
-from picky.env import Environment, PackageSpec
+from picky.env import Environment, PackageSpec, modify
 
 sample_serialized = """\
 name: package
@@ -78,3 +78,41 @@ class TestEnvironment(object):
         compare(Environment.from_string(sample_serialized).to_string(),
                 strict=True,
                 expected=sample_serialized)
+
+
+class TestFilter(object):
+
+    def test_pass_through(self):
+        compare(modify(sample_env), expected=sample_env)
+
+    def test_ignore(self):
+        compare(modify(sample_env, ignore={'ca-certificates', 'attrs'}),
+                expected=Environment({
+                    'name': 'package',
+                    'channels': ['defaults', 'conda-forge'],
+                    'conda': OrderedDict([
+                        ('certifi', PackageSpec('=', 'certifi', '2018.1.18', 'py36_0')),
+                        ('libcxx', PackageSpec('=', 'libcxx', '4.0.1', 'h579ed51_0')),
+                    ]),
+                    'pip': OrderedDict([
+                        ('alabaster', PackageSpec('==', 'alabaster', '0.7.10', None)),
+                        ('urllib3', PackageSpec('==', 'urllib3', '1.22', None)),
+                    ]),
+                }))
+
+    def test_develop(self):
+        compare(modify(sample_env, develop={'attrs': '.'}),
+                expected=Environment({
+                    'name': 'package',
+                    'channels': ['defaults', 'conda-forge'],
+                    'conda': OrderedDict([
+                        ('ca-certificates', PackageSpec('=', 'ca-certificates', '2018.03.07', '0')),
+                        ('certifi', PackageSpec('=', 'certifi', '2018.1.18', 'py36_0')),
+                        ('libcxx', PackageSpec('=', 'libcxx', '4.0.1', 'h579ed51_0')),
+                    ]),
+                    'pip': OrderedDict([
+                        ('alabaster', PackageSpec('==', 'alabaster', '0.7.10', None)),
+                        ('attrs', PackageSpec(' ', '-e', '.', None)),
+                        ('urllib3', PackageSpec('==', 'urllib3', '1.22', None)),
+                    ]),
+                }))

@@ -57,3 +57,25 @@ class Environment(dict):
             for spec in pip_specs.values():
                 pip_deps.append(str(spec))
         return safe_dump(output, default_flow_style=False)
+
+    def copy(self):
+        return type(self)(
+            name=self['name'],
+            channels=list(self['channels']),
+            conda=self['conda'].copy(),
+            pip=self['pip'].copy()
+        )
+
+
+def modify(env, ignore=None, develop=None):
+    env = env.copy()
+    if ignore:
+        for type in 'conda', 'pip':
+            for key in ignore.intersection(env[type]):
+                del env[type][key]
+    if develop:
+        for name, path in develop.items():
+            env['pip'][name] = PackageSpec(' ', '-e', path)
+    return env
+
+
