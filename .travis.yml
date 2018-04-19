@@ -49,7 +49,7 @@ script:
 
 # integration tests
 - conda create -n integration python=$CONDAPY
-- conda activate integration-$CONDAPY
+- conda activate integration
 - conda install --use-local ${PACKAGE_NAME}
 - picky lock
 - picky check
