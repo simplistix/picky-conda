@@ -18,7 +18,6 @@ before_cache:
 - rm -rf $HOME/miniconda/locks $HOME/miniconda/pkgs $HOME/miniconda/var $HOME/miniconda/conda-meta/history
 
 before_install:
-- if ! [[ $TRAVIS_TAG || $TRAVIS_OS_NAME == "linux" && $CONDAPY == "2.7" ]]; then exit 0; fi
 # Get miniconda. Take the right version, so re-installing python is hopefully not needed.
 - if test -e $HOME/miniconda/bin; then
     echo "miniconda already installed.";
@@ -43,14 +42,21 @@ install:
 - conda install -q conda conda-build
 # Useful for debugging any issues with conda
 - conda info -a
-# create the test env
-- conda env create -q python=$CONDAPY --file environment.yaml
-- conda activate test-environment
 
 script:
-- conda build -q conda.recipe
-- conda install --use-local ${PACKAGE_NAME}
+# unit tests
+- conda env create -q python=$CONDAPY --file environment.yaml
+- conda activate test-environment
 - coverage run -m pytest
+- conda deactivate
+
+# check we can build the package
+- conda build -q conda.recipe
+
+# integration tests
+- conda env create -q python=$CONDAPY -n integration-environment
+- conda activate integration-environment
+- conda install --use-local ${PACKAGE_NAME}
 
 after_success:
   - coveralls
