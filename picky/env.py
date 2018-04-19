@@ -23,10 +23,10 @@ class Environment(dict):
 
     @classmethod
     def from_string(cls, yaml):
-        data = safe_load(yaml)
+        data = safe_load(yaml) or {}
         conda = OrderedDict()
         pip = OrderedDict()
-        for spec in data['dependencies']:
+        for spec in data.get('dependencies', ()):
             if isinstance(spec, dict):
                 for pip_spec in spec['pip']:
                     name, version = pip_spec.split('==')
@@ -35,8 +35,8 @@ class Environment(dict):
                 parts = spec.split('=', 2)
                 conda[parts[0]] = PackageSpec('=', *parts)
         return cls(
-            name=data['name'],
-            channels=data['channels'],
+            name=data.get('name'),
+            channels=data.get('channels', ()),
             conda=conda,
             pip=pip,
         )
