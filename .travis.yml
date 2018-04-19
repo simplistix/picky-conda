@@ -1,10 +1,11 @@
-language: generic
+language: python
 sudo: false
 
+python:
+  - "3.6"
+  - "2.7"
+
 env:
-  matrix:
-  - CONDAPY=2.7
-  - CONDAPY=3.6
   global:
     - PACKAGE_NAME=picky-conda
 
@@ -17,7 +18,7 @@ before_install:
     rm -rf $HOME/miniconda;
     mkdir -p $HOME/download;
     if [[ -d $HOME/download/miniconda.sh ]]; then rm -rf $HOME/download/miniconda.sh; fi;
-    if [ "${CONDAPY}" = "2.7" ]; then
+    if [ "${TRAVIS_PYTHON_VERSION}" = "2.7" ]; then
         wget https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh -O $HOME/download/miniconda.sh;
     else
         wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O $HOME/download/miniconda.sh;
@@ -39,7 +40,7 @@ script:
 - set -e
 
 # unit tests
-- conda env create python=$CONDAPY --file environment.yaml
+- conda env create python=$TRAVIS_PYTHON_VERSION --file environment.yaml
 - conda activate test-environment
 - coverage run -m pytest
 - conda deactivate
@@ -48,7 +49,7 @@ script:
 - conda build -q conda.recipe
 
 # integration tests
-- conda create -n integration python=$CONDAPY
+- conda create -n integration python=$TRAVIS_PYTHON_VERSION
 - conda activate integration
 - conda install --use-local ${PACKAGE_NAME}
 - picky lock
@@ -64,7 +65,7 @@ jobs:
 
     - stage: coverage
       if: type != cron
-      env: CONDAPY=3.6
+      python: 3.6
       after_success: skip
 
       install: "pip install -U coveralls-check"
