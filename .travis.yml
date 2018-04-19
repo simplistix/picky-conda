@@ -67,5 +67,5 @@ jobs:
       env: CONDAPY=3.6
       after_success: skip
 
-      install: "conda activate test-environment"
+      install: "pip install -U coveralls-check"
       script: "coveralls-check $TRAVIS_COMMIT"
