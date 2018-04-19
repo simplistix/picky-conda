@@ -8,15 +8,6 @@ env:
   global:
     - PACKAGE_NAME=picky-conda
 
-cache:
-  directories:
-    - $HOME/download # Sufficient to add miniconda.sh to TRAVIS cache.
-    - $HOME/miniconda # Add the installation to TRAVIS cache.
-
-before_cache:
-- if ! [[ $TRAVIS_TAG ]]; then rm -rf $HOME/miniconda/conda-bld; fi
-- rm -rf $HOME/miniconda/locks $HOME/miniconda/pkgs $HOME/miniconda/var $HOME/miniconda/conda-meta/history
-
 before_install:
 # Get miniconda. Take the right version, so re-installing python is hopefully not needed.
 - if test -e $HOME/miniconda/bin; then
@@ -48,8 +39,8 @@ script:
 - set -e
 
 # unit tests
-- conda env create --force python=$CONDAPY --file environment.yaml -n test-$CONDAPY
-- conda activate test-$CONDAPY
+- conda env create python=$CONDAPY --file environment.yaml
+- conda activate test-environment
 - coverage run -m pytest
 - conda deactivate
 
@@ -57,7 +48,7 @@ script:
 - conda build -q conda.recipe
 
 # integration tests
-- conda env create --force -n integration-$CONDAPY python=$CONDAPY
+- conda env create -n integration python=$CONDAPY
 - conda activate integration-$CONDAPY
 - conda install --use-local ${PACKAGE_NAME}
 - picky lock
