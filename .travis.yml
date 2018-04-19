@@ -53,6 +53,8 @@ script:
 - conda install --use-local ${PACKAGE_NAME}
 - picky lock
 - picky check
+- conda deactivate
 
 after_success:
+  - conda activate test-environment
   - coveralls
