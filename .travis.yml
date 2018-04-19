@@ -44,8 +44,11 @@ install:
 - conda info -a
 
 script:
+# stop on error:
+- set -e
+
 # unit tests
-- conda env create python=$CONDAPY --file environment.yaml -n test-$CONDAPY
+- conda env create --force python=$CONDAPY --file environment.yaml -n test-$CONDAPY
 - conda activate test-$CONDAPY
 - coverage run -m pytest
 - conda deactivate
@@ -54,7 +57,7 @@ script:
 - conda build -q conda.recipe
 
 # integration tests
-- conda env create -n integration-$CONDAPY python=$CONDAPY
+- conda env create --force -n integration-$CONDAPY python=$CONDAPY
 - conda activate integration-$CONDAPY
 - conda install --use-local ${PACKAGE_NAME}
 - picky lock
