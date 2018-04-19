@@ -5,6 +5,7 @@ channels:
 dependencies:
 - pytest
 - testfixtures >= 6.0.1
+- coveralls
 - sphinx
 - pkginfo
 - pyyaml
