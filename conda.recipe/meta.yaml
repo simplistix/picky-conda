@@ -16,13 +16,12 @@ build:
   noarch: python
 
 requirements:
-  build:
-    - python
-  run:
+  build: &deps
     - python
     {% for dep in data['install_requires'] %}
     - {{ dep.lower() }}
     {% endfor %}
+  run: *deps
 
 test:
   commands:
