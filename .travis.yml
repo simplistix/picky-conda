@@ -58,3 +58,14 @@ script:
 after_success:
   - conda activate test-environment
   - coveralls
+
+jobs:
+  include:
+
+    - stage: coverage
+      if: type != cron
+      env: CONDAPY=3.6
+      after_success: skip
+
+      install: "conda activate test-environment"
+      script: "coveralls-check $TRAVIS_COMMIT"
