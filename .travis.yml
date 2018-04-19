@@ -48,7 +48,7 @@ script:
 - conda build -q conda.recipe
 
 # integration tests
-- conda env create -n integration python=$CONDAPY
+- conda create -n integration python=$CONDAPY
 - conda activate integration-$CONDAPY
 - conda install --use-local ${PACKAGE_NAME}
 - picky lock
