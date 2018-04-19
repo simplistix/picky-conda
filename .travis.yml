@@ -45,8 +45,8 @@ install:
 
 script:
 # unit tests
-- conda env create -q python=$CONDAPY --file environment.yaml
-- conda activate test-environment
+- conda env create python=$CONDAPY --file environment.yaml -n test-$CONDAPY
+- conda activate test-$CONDAPY
 - coverage run -m pytest
 - conda deactivate
 
@@ -54,8 +54,8 @@ script:
 - conda build -q conda.recipe
 
 # integration tests
-- conda env create -q python=$CONDAPY -n integration-environment
-- conda activate integration-environment
+- conda env create python=$CONDAPY -n integration-$CONDAPY
+- conda activate integration-$CONDAPY
 - conda install --use-local ${PACKAGE_NAME}
 
 after_success:
