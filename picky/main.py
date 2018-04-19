@@ -1,81 +1,36 @@
 from argparse import ArgumentParser
 
-import logging
-import sys
-from datetime import datetime
-from picky.handlers import PipHandler, CondaHandler
-from picky.requirements import Diff
+from .env import Environment, diff, modify
+from .conda import conda_env_export
+from .config import BUILD, parse_config
 
 
-def log_level(text):
-    level_name = str(text).upper()
-    try:
-        return getattr(logging, level_name)
-    except AttributeError:
-        raise TypeError(level_name)
+def lock(current_env, concrete_path):
+    with open(concrete_path, 'w') as target:
+        target.write(current_env.to_string())
+
+
+def check(current_env, concrete_path):
+    expected_env = Environment.from_path(concrete_path)
+    return diff(expected_env, current_env)
 
 
 def parse_args():
     parser = ArgumentParser()
-    parser.add_argument('--pip', default='pip')
-    parser.add_argument('--conda', default='conda')
-    parser.add_argument('--pip-requirements', default='requirements.txt')
-    parser.add_argument('--conda-versions', default='conda_versions.txt')
-    parser.add_argument('--update', action='store_true')
-    parser.add_argument('-l', '--log-level', default='warn', type=log_level)
+    parser.add_argument('--concrete', default='environment.lock.yaml')
+    parser.add_argument('--config', default='picky.yaml')
+    commands = parser.add_subparsers()
+    for command in lock, check:
+        command_parser = commands.add_parser(command.__name__, help=command.__doc__)
+        command_parser.set_defaults(func=command)
     args = parser.parse_args()
     return args
 
 
-def setup_logging(level):
-    if level < logging.WARNING:
-        template = '%(asctime)-15s %(levelname)-7s %(message)s'
-    else:
-        template = '%(message)s'
-    logger = logging.getLogger()
-    formatter = logging.Formatter(template, '%Y-%m-%d %H:%M:%S')
-    handler = logging.StreamHandler(sys.stdout)
-    handler.setFormatter(formatter)
-    logger.setLevel(level)
-    handler.setLevel(level)
-    logger.addHandler(handler)
-
-
-def error_and_exit(pip, conda):
-    logging.getLogger().error('Neither %s nor %s could be found',
-                              pip, conda)
-    sys.exit(2)
-
-
-def exit_with_code(conda_diff, pip_diff):
-    if pip_diff or conda_diff:
-        exit_code = 1
-    else:
-        exit_code = 0
-    sys.exit(exit_code)
-
-
 def main():
     args = parse_args()
-    setup_logging(args.log_level)
-    now = datetime.now()
-
-    pip = PipHandler(args.pip, args.pip_requirements)
-    conda = CondaHandler(args.conda, args.conda_versions)
-
-    if not (pip.executable_found or conda.executable_found):
-        error_and_exit(args.pip, args.conda)
-
-    conda.used.combine_with(pip.used, now)
-
-    pip_diff = Diff(pip.specified, pip.used)
-    conda_diff = Diff(conda.specified, conda.used)
-
-    pip_diff.log()
-    conda_diff.log()
-
-    if args.update:
-        pip.update(pip_diff, now)
-        conda.update(conda_diff, now)
-
-    exit_with_code(conda_diff, pip_diff)
+    config = parse_config(args.config)
+    export = conda_env_export(config.detail == BUILD)
+    raw_env = Environment.from_string(export)
+    current_env = modify(raw_env, config.ignore, config.develop)
+    return args.func(current_env, args.concrete)

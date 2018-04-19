@@ -57,6 +57,8 @@ script:
 - conda env create python=$CONDAPY -n integration-$CONDAPY
 - conda activate integration-$CONDAPY
 - conda install --use-local ${PACKAGE_NAME}
+- picky lock
+- picky check
 
 after_success:
   - coveralls
