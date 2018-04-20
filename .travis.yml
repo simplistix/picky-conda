@@ -50,6 +50,7 @@ script:
 - conda build -q conda.recipe
 
 # integration tests
+- export
 - conda create -n integration python=$TRAVIS_PYTHON_VERSION
 - conda activate integration
 - conda install --use-local ${PACKAGE_NAME}
@@ -95,7 +96,6 @@ jobs:
       - conda install -q conda conda-build anaconda-client
       before_deploy:
       - export ANACONDA_LABEL=$(python -c 'import os; tt=os.environ["TRAVIS_TAG"]; print("dev" if "dev" in tt else "main")')
-      - export PROJECT_NAME=$PROJECT_NAME
       - source $HOME/miniconda/bin/activate
       - export
       deploy:
