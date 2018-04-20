@@ -50,7 +50,6 @@ script:
 - conda build -q conda.recipe
 
 # integration tests
-- export
 - conda create -n integration python=$TRAVIS_PYTHON_VERSION
 - conda activate integration
 - conda install --use-local ${PACKAGE_NAME}
@@ -97,11 +96,10 @@ jobs:
       before_deploy:
       - export ANACONDA_LABEL=$(python -c 'import os; tt=os.environ["TRAVIS_TAG"]; print("dev" if "dev" in tt else "main")')
       - source $HOME/miniconda/bin/activate
-      - export
       deploy:
         provider: script
         skip_cleanup: true
-        script: "export && conda build -q conda.recipe && anaconda -t $ANACONDA_TOKEN upload --force -l ${ANACONDA_LABEL} ${HOME}/miniconda/conda-bld/*/${PROJECT_NAME}-*.tar.bz2"
+        script: "export && conda build -q conda.recipe && anaconda -t $ANACONDA_TOKEN upload --force -l ${ANACONDA_LABEL} ${HOME}/miniconda/conda-bld/*/${PACKAGE_NAME}-*.tar.bz2"
         on:
           tags: true
           repo: Simplistix/picky-conda
