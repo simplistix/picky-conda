@@ -90,9 +90,13 @@ jobs:
           wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O $HOME/download/miniconda.sh;
           bash $HOME/download/miniconda.sh -b -p $HOME/miniconda;
         fi
+      - source $HOME/miniconda/bin/activate
+      - conda config --set always_yes yes --set changeps1 no
+      - conda install -q conda conda-build
       before_deploy:
       - export ANACONDA_LABEL=$(python -c 'import os; tt=os.environ["TRAVIS_TAG"]; print("dev" if "dev" in tt else "main")')
       # build the package
+      - source $HOME/miniconda/bin/activate
       - conda build -q conda.recipe
       deploy:
         provider: script
