@@ -1,6 +1,12 @@
 Changes
 =======
 
+2.0.0 (20 April 2018)
+-------------------
+
+- Re-write to target just conda environments and based on `environment.yaml`,
+  `environment.lock.yaml` and `picky.yaml`.
+
 0.9.2 (1 July 2015)
 -------------------
 
