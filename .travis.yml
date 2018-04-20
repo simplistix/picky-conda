@@ -95,11 +95,13 @@ jobs:
       - conda install -q conda conda-build anaconda-client
       before_deploy:
       - export ANACONDA_LABEL=$(python -c 'import os; tt=os.environ["TRAVIS_TAG"]; print("dev" if "dev" in tt else "main")')
+      - export PROJECT_NAME=$PROJECT_NAME
       - source $HOME/miniconda/bin/activate
+      - export
       deploy:
         provider: script
         skip_cleanup: true
-        script: "conda build -q conda.recipe && anaconda -t $ANACONDA_TOKEN upload --force -l ${ANACONDA_LABEL} ${HOME}/miniconda/conda-bld/*/${PROJECT_NAME}-*.tar.bz2"
+        script: "export && conda build -q conda.recipe && anaconda -t $ANACONDA_TOKEN upload --force -l ${ANACONDA_LABEL} ${HOME}/miniconda/conda-bld/*/${PROJECT_NAME}-*.tar.bz2"
         on:
           tags: true
           repo: Simplistix/picky-conda
