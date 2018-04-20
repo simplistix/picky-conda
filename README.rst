@@ -1,4 +1,4 @@
-|Travis|_ |Docs|_
+|Travis|_ |Coveralls|_ |Docs|_
 
 .. |Travis| image:: https://api.travis-ci.org/Simplistix/picky-conda.svg?branch=master
 .. _Travis: https://travis-ci.org/Simplistix/picky-conda
