@@ -8,7 +8,7 @@ description = "A tool for locking down your conda package usage."
 
 setup(
     name='picky-conda',
-    version='2.0.0dev1',
+    version='2.0.0dev2',
     author='Chris Withers',
     author_email='chris@withers.org',
     license='MIT',

@@ -100,3 +100,5 @@ jobs:
         - conda build -q conda.recipe
         # push it up
         - anaconda -t $ANACONDA_TOKEN upload --force -l ${ANACONDA_LABEL} ${HOME}/miniconda/conda-bld/*/${PROJECT_NAME}-*.tar.bz2
+        on:
+          all_branches: true
