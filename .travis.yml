@@ -80,10 +80,16 @@ jobs:
       after_success: true
 
       install:
-      - echo "Installing miniconda.";
-        mkdir -p $HOME/download;
-        wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O $HOME/download/miniconda.sh;
-        bash $HOME/download/miniconda.sh -b -p $HOME/miniconda;
+      - if test -e $HOME/miniconda/bin; then
+          echo "miniconda already installed.";
+        else
+          echo "Installing miniconda.";
+          rm -rf $HOME/miniconda;
+          mkdir -p $HOME/download;
+          if [[ -d $HOME/download/miniconda.sh ]]; then rm -rf $HOME/download/miniconda.sh; fi;
+          wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O $HOME/download/miniconda.sh;
+          bash $HOME/download/miniconda.sh -b -p $HOME/miniconda;
+        fi
       before_deploy:
       - export ANACONDA_LABEL=$(python -c 'import os; tt=os.environ["TRAVIS_TAG"]; print("dev" if "dev" in tt else "main")')
       deploy:
