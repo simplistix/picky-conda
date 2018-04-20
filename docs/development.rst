@@ -20,7 +20,6 @@ repository, assuming you have installed conda by following its instructions::
 
   $ conda env create -n picky-conda python=3.6 --file environment.yaml
   $ conda activate picky-conda
-  $ pip install -e .
 
 __ https://pip.pypa.io/en/stable/
 
