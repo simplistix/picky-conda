@@ -10,5 +10,3 @@ dependencies:
 - pkginfo
 - pyyaml
 - anaconda-client
-- pip:
-  - -e .
