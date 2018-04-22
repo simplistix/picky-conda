@@ -1,6 +1,11 @@
 Changes
 =======
 
+2.0.1 (22 April 2018)
+---------------------
+
+- Fix bugs in handling of packages installed in `develop` mode.
+
 2.0.0 (20 April 2018)
 -------------------
 
