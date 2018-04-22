@@ -18,6 +18,7 @@ dependencies:
   - alabaster==0.7.10
   - attrs==17.4.0
   - urllib3==1.22
+  - -e .
 """
 
 sample_export = sample_serialized + """\
@@ -37,6 +38,9 @@ sample_env = Environment({
         ('alabaster', PackageSpec('==', 'alabaster', '0.7.10', None)),
         ('attrs', PackageSpec('==', 'attrs', '17.4.0', None)),
         ('urllib3', PackageSpec('==', 'urllib3', '1.22', None)),
+    ]),
+    'develop': OrderedDict([
+        ('.', PackageSpec(' ', '-e', '.', None)),
     ]),
 })
 
@@ -98,6 +102,9 @@ class TestFilter(object):
                         ('alabaster', PackageSpec('==', 'alabaster', '0.7.10', None)),
                         ('urllib3', PackageSpec('==', 'urllib3', '1.22', None)),
                     ]),
+                    'develop': OrderedDict([
+                        ('.', PackageSpec(' ', '-e', '.', None)),
+                    ]),
                 }))
 
     def test_develop(self):
@@ -112,8 +119,10 @@ class TestFilter(object):
                     ]),
                     'pip': OrderedDict([
                         ('alabaster', PackageSpec('==', 'alabaster', '0.7.10', None)),
-                        ('attrs', PackageSpec(' ', '-e', '.', None)),
                         ('urllib3', PackageSpec('==', 'urllib3', '1.22', None)),
+                    ]),
+                    'develop': OrderedDict([
+                        ('.', PackageSpec(' ', '-e', '.', None)),
                     ]),
                 }))
 
@@ -146,6 +155,7 @@ class TestDiff(object):
                 ('alabaster', PackageSpec('==', 'alabaster', '0.7.10', None)),
                 ('urllib3', PackageSpec('==', 'urllib3', '1.22', None)),
             ]),
+            'develop': OrderedDict(),
         })
         with OutputCapture() as output:
             result = diff(sample_env, other_env)
@@ -154,7 +164,7 @@ class TestDiff(object):
             Expected environment does not match actual:
             --- expected
             +++ actual
-            @@ -1,12 +1,9 @@
+            @@ -1,13 +1,9 @@
              channels:
             -- defaults
              - conda-forge
@@ -166,4 +176,5 @@ class TestDiff(object):
                - alabaster==0.7.10
             -  - attrs==17.4.0
                - urllib3==1.22
+            -  - -e .
             """))

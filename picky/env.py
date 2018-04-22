@@ -26,11 +26,16 @@ class Environment(dict):
         data = safe_load(yaml) or {}
         conda = OrderedDict()
         pip = OrderedDict()
+        develop = OrderedDict()
         for spec in data.get('dependencies', ()):
             if isinstance(spec, dict):
                 for pip_spec in spec['pip']:
-                    name, version = pip_spec.split('==')
-                    pip[name] = PackageSpec('==', name, version)
+                    if pip_spec.startswith('-e'):
+                        e, path = pip_spec.split()
+                        develop[path] = PackageSpec(' ', e, path)
+                    else:
+                        name, version = pip_spec.split('==')
+                        pip[name] = PackageSpec('==', name, version)
             else:
                 parts = spec.split('=', 2)
                 conda[parts[0]] = PackageSpec('=', *parts)
@@ -39,6 +44,7 @@ class Environment(dict):
             channels=data.get('channels', ()),
             conda=conda,
             pip=pip,
+            develop=develop,
         )
 
     @classmethod
@@ -56,10 +62,13 @@ class Environment(dict):
         for spec in self['conda'].values():
             deps.append(str(spec))
         pip_specs = self.get('pip')
-        if pip_specs:
+        develop_specs = self.get('develop')
+        if pip_specs or develop_specs:
             pip_deps = []
             deps.append({'pip': pip_deps})
             for spec in pip_specs.values():
+                pip_deps.append(str(spec))
+            for spec in develop_specs.values():
                 pip_deps.append(str(spec))
         return safe_dump(output, default_flow_style=False)
 
@@ -68,7 +77,8 @@ class Environment(dict):
             name=self['name'],
             channels=list(self['channels']),
             conda=self['conda'].copy(),
-            pip=self['pip'].copy()
+            pip=self['pip'].copy(),
+            develop=self['develop'].copy(),
         )
 
 
@@ -80,7 +90,9 @@ def modify(env, ignore=None, develop=None):
                 del env[type][key]
     if develop:
         for name, path in develop.items():
-            env['pip'][name] = PackageSpec(' ', '-e', path)
+            if name in env['pip']:
+                del env['pip'][name]
+            env['develop'][path] = PackageSpec(' ', '-e', path)
     return env
 
 

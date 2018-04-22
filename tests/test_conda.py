@@ -16,7 +16,8 @@ class TestRunCommand(object):
 
     def test_structure(self):
         env = Environment.from_string(conda_env_export())
-        compare(env.keys(), expected=['name', 'channels', 'conda', 'pip'])
+        compare(env.keys(),
+                expected=['name', 'channels', 'conda', 'pip', 'develop'])
 
     def test_build(self):
         env = Environment.from_string(conda_env_export(include_build=True))

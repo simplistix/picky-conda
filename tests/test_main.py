@@ -94,7 +94,7 @@ not_okay_output = """
 Expected environment does not match actual:
 --- expected
 +++ actual
-@@ -1,3 +1,12 @@
+@@ -1,3 +1,13 @@
 -channels: []
 -dependencies: []
 +channels:
@@ -108,6 +108,7 @@ Expected environment does not match actual:
 +  - alabaster==0.7.10
 +  - attrs==17.4.0
 +  - urllib3==1.22
++  - -e .
 """
 
 
