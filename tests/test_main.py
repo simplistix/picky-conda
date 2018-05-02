@@ -98,8 +98,8 @@ Expected environment does not match actual:
 -channels: []
 -dependencies: []
 +channels:
-+- defaults
 +- conda-forge
++- defaults
 +dependencies:
 +- ca-certificates=2018.03.07=0
 +- certifi=2018.1.18=py36_0

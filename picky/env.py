@@ -101,6 +101,7 @@ def diff(expected, actual):
     for env in expected, actual:
         env = env.copy()
         del env['name']
+        env['channels'].sort()
         envs.append(env.to_string().split('\n'))
     udiff = '\n'.join(unified_diff(
         *envs, lineterm='', fromfile='expected', tofile='actual'

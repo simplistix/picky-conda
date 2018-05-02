@@ -143,6 +143,14 @@ class TestDiff(object):
         assert result == 0
         output.compare('')
 
+    def test_channel_order_different(self):
+        other_env = sample_env.copy()
+        other_env['channels'].reverse()
+        with OutputCapture() as output:
+            result = diff(sample_env, other_env)
+        assert result == 0
+        output.compare('')
+
     def test_others_different(self):
         other_env = Environment({
             'name': 'package',
@@ -166,8 +174,8 @@ class TestDiff(object):
             +++ actual
             @@ -1,13 +1,9 @@
              channels:
-            -- defaults
              - conda-forge
+            -- defaults
              dependencies:
              - ca-certificates=2018.03.07=0
             -- certifi=2018.1.18=py36_0
