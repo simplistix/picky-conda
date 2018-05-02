@@ -1,6 +1,11 @@
 Changes
 =======
 
+2.0.2 (2 May 2018)
+------------------
+
+- Channel ordering is now ignored ignored by ``picky check``.
+
 2.0.1 (22 April 2018)
 ---------------------
 
