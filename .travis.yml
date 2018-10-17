@@ -42,7 +42,7 @@ script:
 - set -e
 
 # unit tests
-- conda create -n test-environment
+- conda create -n test-environment python=$TRAVIS_PYTHON_VERSION
 - conda activate test-environment
 - conda env update --file environment.yaml
 - coverage run -m pytest
