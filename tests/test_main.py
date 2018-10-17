@@ -8,8 +8,8 @@ from tests.test_env import sample_serialized
 sample_serialized_no_build = """\
 name: package
 channels:
-- defaults
 - conda-forge
+- defaults
 dependencies:
 - ca-certificates=2018.03.07
 - certifi=2018.1.18
@@ -63,8 +63,8 @@ detail: version
 serialized_after_config = """\
 name: package
 channels:
-- defaults
 - conda-forge
+- defaults
 dependencies:
 - ca-certificates=2018.03.07
 - certifi=2018.1.18

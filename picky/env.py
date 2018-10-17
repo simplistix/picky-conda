@@ -18,6 +18,9 @@ class PackageSpec(object):
         return self.sep.join(e for e in (self.name, self.version, self.build)
                              if e is not None)
 
+    def __lt__ (self, other):
+        return (self.name, self.version) < (other.name, other.version)
+
 
 class Environment(dict):
 
@@ -57,18 +60,18 @@ class Environment(dict):
         name = self.get('name')
         if name:
             output['name'] = name
-        output['channels'] = self['channels']
+        output['channels'] = sorted(self['channels'])
         output['dependencies'] = deps = []
-        for spec in self['conda'].values():
+        for spec in sorted(self['conda'].values()):
             deps.append(str(spec))
         pip_specs = self.get('pip')
         develop_specs = self.get('develop')
         if pip_specs or develop_specs:
             pip_deps = []
             deps.append({'pip': pip_deps})
-            for spec in pip_specs.values():
+            for spec in sorted(pip_specs.values()):
                 pip_deps.append(str(spec))
-            for spec in develop_specs.values():
+            for spec in sorted(develop_specs.values()):
                 pip_deps.append(str(spec))
         return safe_dump(output, default_flow_style=False)
 
@@ -101,7 +104,6 @@ def diff(expected, actual):
     for env in expected, actual:
         env = env.copy()
         del env['name']
-        env['channels'].sort()
         envs.append(env.to_string().split('\n'))
     udiff = '\n'.join(unified_diff(
         *envs, lineterm='', fromfile='expected', tofile='actual'

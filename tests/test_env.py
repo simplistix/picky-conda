@@ -8,8 +8,8 @@ from picky.env import Environment, PackageSpec, modify, diff
 sample_serialized = """\
 name: package
 channels:
-- defaults
 - conda-forge
+- defaults
 dependencies:
 - ca-certificates=2018.03.07=0
 - certifi=2018.1.18=py36_0
@@ -28,7 +28,7 @@ prefix: /Users/chris/anaconda2/envs/picky-conda
 
 sample_env = Environment({
     'name': 'package',
-    'channels': ['defaults', 'conda-forge'],
+    'channels': ['conda-forge', 'defaults'],
     'conda': OrderedDict([
         ('ca-certificates', PackageSpec('=', 'ca-certificates', '2018.03.07', '0')),
         ('certifi', PackageSpec('=', 'certifi', '2018.1.18', 'py36_0')),
@@ -93,7 +93,7 @@ class TestFilter(object):
         compare(modify(sample_env, ignore={'ca-certificates', 'attrs'}),
                 expected=Environment({
                     'name': 'package',
-                    'channels': ['defaults', 'conda-forge'],
+                    'channels': ['conda-forge', 'defaults'],
                     'conda': OrderedDict([
                         ('certifi', PackageSpec('=', 'certifi', '2018.1.18', 'py36_0')),
                         ('libcxx', PackageSpec('=', 'libcxx', '4.0.1', 'h579ed51_0')),
@@ -111,7 +111,7 @@ class TestFilter(object):
         compare(modify(sample_env, develop={'attrs': '.'}),
                 expected=Environment({
                     'name': 'package',
-                    'channels': ['defaults', 'conda-forge'],
+                    'channels': ['conda-forge', 'defaults'],
                     'conda': OrderedDict([
                         ('ca-certificates', PackageSpec('=', 'ca-certificates', '2018.03.07', '0')),
                         ('certifi', PackageSpec('=', 'certifi', '2018.1.18', 'py36_0')),
