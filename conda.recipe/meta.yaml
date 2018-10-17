@@ -17,7 +17,7 @@ build:
 
 requirements:
   build: &deps
-    - python
+    - "python *"
     {% for dep in data['install_requires'] %}
     - {{ dep.lower() }}
     {% endfor %}

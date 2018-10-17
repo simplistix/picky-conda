@@ -1,6 +1,12 @@
 Changes
 =======
 
+2.0.4 (17 Oct 2018)
+-------------------
+
+- Attempt to get Travis to build conda packages that do not require a specific version of Python,
+  like it used to.
+
 2.0.3 (17 Oct 2018)
 -------------------
 
