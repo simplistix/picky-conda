@@ -1,6 +1,12 @@
 Changes
 =======
 
+2.0.3 (17 Oct 2018)
+-------------------
+
+- All packages are sorted by name when serializing. This prevents spurious differences
+  being reported when the order of packages differs as reported by conda.
+
 2.0.2 (2 May 2018)
 ------------------
 
