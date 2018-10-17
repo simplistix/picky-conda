@@ -42,8 +42,9 @@ script:
 - set -e
 
 # unit tests
-- conda env create --file environment.yaml
+- conda create -n test-environment
 - conda activate test-environment
+- conda env update --file environment.yaml
 - coverage run -m pytest
 - conda deactivate
 
@@ -53,6 +54,7 @@ script:
 # integration tests
 - conda create -n integration python=$TRAVIS_PYTHON_VERSION
 - conda activate integration
+- python --version
 - conda install --use-local ${PACKAGE_NAME}
 - picky lock
 - picky check
