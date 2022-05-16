@@ -1,6 +1,14 @@
 Picky for Conda documentation
 =============================
 
+
+.. note:: 
+
+  This project is not currently maintained and `conda-lock`__ is suggested as an alternative.
+  
+  __ https://github.com/conda-incubator/conda-lock
+  
+  
 Picky is a tool for making sure that the packages you have installed
 in a `conda`__ environment match those you have specified.
 
